@@ -1,0 +1,23 @@
+<div 
+  cdkDropList
+  id="drop-area"
+  [cdkDropListConnectedTo]="['palette']"
+  (cdkDropListDropped)="onDrop($event)" 
+  class="border p-4 min-h-[80vh] w-full rounded flex flex-col items-center justify-center relative"
+>
+@if (fields$ | async; as schema) { 
+    @for(field of schema.fields; track $index){
+      <app-rerender [field]="field"></app-rerender>
+    }
+
+    @if(schema.fields?.length === 0){
+    <div 
+         class="text-center text-[6rem] text-gray-300">
+      <p class="text-lg font-medium">
+        <i class="pi pi-file"></i> Drop Area
+      </p>
+      <p class="text-sm">Drag and drop fields here</p>
+    </div>
+    }
+}
+</div>

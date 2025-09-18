@@ -1,0 +1,31 @@
+<div class="field-renderer" [class]="getColumnClass()" [class.edit-mode]="isEditMode" [style.width]="width()"
+  (click)="!isDragging && onFieldClick($event)" (mousedown)="onMouseDown($event)" (mouseup)="onMouseUp()"
+  (mouseleave)="onMouseLeave()" [formGroup]="formGroup">
+  @switch(getType()) {
+    <!-- FieldType canonical names -->
+    @case('input-text') { <app-inputtext [field]="field"></app-inputtext> }
+    @case('password') { <app-password [field]="field"></app-password> }
+    @case('input-number') { <app-inputnumber [field]="field"></app-inputnumber> }
+    @case('textarea') { <app-textarea [field]="field"></app-textarea> }
+    @case('colorpicker') { <app-colorpicker [field]="field"></app-colorpicker> }
+    @case('datepicker') { <app-datepicker [field]="field"></app-datepicker> }
+    @case('select') { <app-select [field]="field"></app-select> }
+    @case('multi-select') { <app-multiselect [field]="field"></app-multiselect> }
+    @case('checkbox') { <app-checkbox [field]="field"></app-checkbox> }
+    @case('radio') { <app-radiobutton [field]="field"></app-radiobutton> }
+    @case('select-button') { <app-selectbutton></app-selectbutton> }
+    @case('toggle-button') { <app-togglebutton></app-togglebutton> }
+    @case('toggle-switch') { <app-toggleswitch></app-toggleswitch> }
+    @case('group') { <app-container-formgroup [group]="field"></app-container-formgroup> }
+   
+    
+
+    
+    
+    
+
+    @default {
+      <span class="text-red-500">Unsupported field: {{ getType() || field.kind }}</span>
+    }
+  }
+</div>

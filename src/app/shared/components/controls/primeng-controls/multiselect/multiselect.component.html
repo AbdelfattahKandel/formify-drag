@@ -1,0 +1,34 @@
+@if (formControlInst()) {
+  <p-multiSelect
+    [formControl]="formControlInst()!"
+    [options]="options()"
+    optionLabel="label"
+    optionValue="value"
+    [showClear]="true"
+    [display]="'chip'"
+    styleClass="w-full"
+    [placeholder]="(field().placeholder ?? field().label) ?? ''"
+  ></p-multiSelect>
+} @else if (controlName()) {
+  <p-multiSelect
+    [formControlName]="controlName()!"
+    [options]="options()"
+    optionLabel="label"
+    optionValue="value"
+    [showClear]="true"
+    [display]="'chip'"
+    styleClass="w-full"
+    [placeholder]="(field().placeholder ?? field().label) ?? ''"
+  ></p-multiSelect>
+} @else {
+  <p-multiSelect
+    [options]="options()"
+    optionLabel="label"
+    optionValue="value"
+    [showClear]="true"
+    [display]="'chip'"
+    styleClass="w-full"
+    [placeholder]="(field().placeholder ?? field().label) ?? ''"
+    [disabled]="true"
+  ></p-multiSelect>
+}

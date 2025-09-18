@@ -1,0 +1,24 @@
+@if (formControlInst()) {
+  <p-checkbox
+    [formControl]="formControlInst()!"
+    [binary]="true"
+    [inputId]="field().key"
+  ></p-checkbox>
+  @if (field().label) {
+    <label class="ml-2" [for]="field().key">{{ field().label }}</label>
+  }
+} @else if (controlName()) {
+  <p-checkbox
+    [formControlName]="controlName()!"
+    [binary]="true"
+    [inputId]="field().key"
+  ></p-checkbox>
+  @if (field().label) {
+    <label class="ml-2" [for]="field().key">{{ field().label }}</label>
+  }
+} @else {
+  <p-checkbox [binary]="true" [inputId]="field().key" [disabled]="true"></p-checkbox>
+  @if (field().label) {
+    <label class="ml-2 opacity-50" [for]="field().key">{{ field().label }}</label>
+  }
+}

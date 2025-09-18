@@ -1,0 +1,33 @@
+<div class="p-fluid">
+  <div class="mb-4">
+    <p class="mb-2">Copy the JSON below to use it in your application:</p>
+    <div class="p-inputgroup">
+      <textarea [rows]="10" [value]="json" class="w-full border p-2 min-h-[300px]" readonly></textarea>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-copy"
+        class="p-button-primary"
+        (click)="copyToClipboard()"
+        pTooltip="Copy to clipboard"
+        tooltipPosition="top">
+      </button>
+    </div>
+  </div>
+  <div class="flex justify-end gap-2">
+    <button
+      pButton
+      type="button"
+      label="Close"
+      class="p-button-text"
+      (click)="ref.close(false)">
+    </button>
+    <button
+      pButton
+      type="button"
+      label="Copy & Close"
+      class="p-button-primary"
+      (click)="copyAndClose()">
+    </button>
+  </div>
+</div>

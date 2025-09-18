@@ -1,3 +1,7 @@
+---
+trigger: always_on
+---
+
 # Angular 19 + PrimeNG 19 + Tailwind 4 + Body Style Guidelines
 #persona
 
@@ -9,7 +13,12 @@
 - Follow structured naming: **clear, descriptive variable and function names** (no abbreviations).
 
 ---
-
+## Angular cli 
+- always use angular cli like this command
+ng g c shared/etc... path 
+ng g s core/services/etc... path
+ng g i core/models/etc... path
+ng d d core/directives/etc... path
 ## Components & Forms
 - Each component should have:
   - `.ts` file (logic)
@@ -24,8 +33,7 @@
 
 Example initialization pattern:
 
-ts
-Copy code
+
 formName!: FormGroup;
 
 initForm() {
@@ -57,7 +65,6 @@ Prefer Angular 19 syntax:
 
 @for / @if /@switch @case instead of *ngFor / *ngIf / *ngSwitch.
 
- allowed.
 
 Avoid ngClass and ngStyle; use [class] and [style] bindings.
 
@@ -180,4 +187,3 @@ Use OnPush for change detection for all components.
 Templates: always use @for / @if for loops and conditions.
 
 Keep components small, readable, maintainable, and reusable.
-

@@ -1,0 +1,22 @@
+<div class="w-full p-4">
+    <!-- <h2 class="text-lg font-semibold mb-4">Form Elements</h2> -->
+    
+    <div class="grid grid-cols-1 gap-3">
+      @for (tool of tools; track (tool.id ?? tool.type ?? tool.kind ?? $index)) {
+        <div 
+          cdkDrag
+          [cdkDragData]="tool"
+          (cdkDragStarted)="onDragStarted(tool)"
+          (cdkDragEnded)="onDragEnd(tool)"
+          class="p-3 border rounded-md shadow-sm hover:shadow-md transition-shadow cursor-grab"
+        >
+          <div class="flex items-center gap-2">
+            <i class="pi pi-arrows-alt mr-2"></i>
+            <span>
+              {{ tool.label || tool.type }}
+            </span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>

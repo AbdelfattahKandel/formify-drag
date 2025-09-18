@@ -1,0 +1,22 @@
+@if (formControlInst()) {
+  <input pInputText
+         type="text"
+         [formControl]="formControlInst()!"
+         [placeholder]="field().placeholder || field().label"
+         class="w-full"
+         icon="pi pi-user" />
+} @else if (controlName()) {
+  <input pInputText
+         type="text"
+         [formControlName]="controlName()!"
+         [placeholder]="field().placeholder || field().label"
+         class="w-full"
+         icon="pi pi-user" />
+} @else {
+  <input pInputText
+         type="text"
+         [placeholder]="field().placeholder || field().label"
+         class="w-full"
+         disabled
+         icon="pi pi-user"/>
+}

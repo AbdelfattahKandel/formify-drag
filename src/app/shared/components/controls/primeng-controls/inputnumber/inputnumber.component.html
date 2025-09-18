@@ -1,0 +1,19 @@
+@if (formControlInst()) {
+  <p-inputNumber
+    [formControl]="formControlInst()!"
+    inputStyleClass="w-full"
+    [placeholder]="(field().placeholder ?? field().label) ?? ''"
+  ></p-inputNumber>
+} @else if (controlName()) {
+  <p-inputNumber
+    [formControlName]="controlName()!"
+    inputStyleClass="w-full"
+    [placeholder]="(field().placeholder ?? field().label) ?? ''"
+  ></p-inputNumber>
+} @else {
+  <p-inputNumber
+    [disabled]="true"
+    inputStyleClass="w-full"
+    [placeholder]="(field().placeholder ?? field().label) ?? ''"
+  ></p-inputNumber>
+}

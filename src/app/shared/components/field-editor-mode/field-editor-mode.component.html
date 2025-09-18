@@ -1,0 +1,82 @@
+<p-dialog header="Edit Field" [(visible)]="visible" (onHide)="onHide()" [style]="{ width: '450px' }" [modal]="true"
+  [draggable]="false" [resizable]="false" [closable]="true" [closeOnEscape]="true"
+  [contentStyle]="{'max-height': '80vh'}" [baseZIndex]="10000">
+
+  <div class="field-editor p-fluid">
+    <div class="field">
+      <label for="fieldLabel" class="block text-900 font-medium mb-2">Field Label</label>
+      <input id="fieldLabel" type="text" pInputText [(ngModel)]="field.label" class="w-full"
+        placeholder="Enter field label" required>
+    </div>
+
+    <div class="field mt-4">
+      <label for="fieldKey" class="block text-900 font-medium mb-2">Field Key</label>
+      <input id="fieldKey" type="text" pInputText [(ngModel)]="field.formControl" class="w-full" placeholder="Enter field key"
+        required>
+    </div>
+
+    <div class="field mt-4">
+      <label for="fieldType" class="block text-900 font-medium mb-2">Field Type</label>
+      <p-dropdown id="fieldType" [options]="fieldTypes" [(ngModel)]="field.type" optionLabel="label" optionValue="value"
+        placeholder="Select field type" styleClass="w-full">
+      </p-dropdown>
+    </div>
+
+    <div class="field mt-4">
+      <label for="fieldColumns" class="block text-900 font-medium mb-2">Number of fields in row</label>
+      <p-inputNumber id="fieldColumns" [(ngModel)]="columns" [min]="1" [max]="4" [showButtons]="true"
+        buttonLayout="horizontal" [inputStyle]="{'width': '100%'}" styleClass="w-full">
+        <ng-template pTemplate="incrementbutton">
+          <i class="pi pi-plus"></i>
+        </ng-template>
+        <ng-template pTemplate="decrementbutton">
+          <i class="pi pi-minus"></i>
+        </ng-template>
+      </p-inputNumber>
+      <small class="block text-500 mt-1">choose number of fields to display in one row (1-4)</small>
+    </div>
+
+    <div class="field mt-4">
+      <label for="fieldWidth" class="block text-900 font-medium mb-2">Field Width</label>
+      <div class="flex align-items-center gap-2">
+        <input type="text" pInputText [(ngModel)]="width" style="width: 100%" placeholder="e.g., 100% or 200px">
+        <button *ngIf="width && width !== '100%'" pButton type="button" icon="pi pi-times"
+          class="p-button-text p-button-sm" (click)="width = '100%'" pTooltip="Reset to auto width"
+          tooltipPosition="top">
+        </button>
+      </div>
+    </div>
+
+    <div class="field mt-4" *ngIf="field.type === 'select' || field.type === 'radio' || field.type === 'checkbox'">
+      <label class="block text-900 font-medium mb-2">Options</label>
+      <p-chips [(ngModel)]="chipValues" (onAdd)="onChipAdd($event)" (onRemove)="onChipRemove($event)"
+        placeholder="Add options" [addOnBlur]="true" separator="," class="w-full">
+      </p-chips>
+      <small class="text-500">Add options (comma separated or press Enter)</small>
+    </div>
+
+    <div class="field mt-4">
+      <p-checkbox [ngModel]="isRequired" (ngModelChange)="isRequired = $event" [binary]="true" label="Required field">
+      </p-checkbox>
+    </div>
+
+    <div class="field mt-4">
+      <label for="placeholder" class="block text-900 font-medium mb-2">Placeholder</label>
+      <input id="placeholder" type="text" pInputText [(ngModel)]="field.placeholder" class="w-full"
+        placeholder="Enter placeholder text">
+    </div>
+
+    <div class="field mt-4">
+      <label for="value" class="block text-900 font-medium mb-2">Value</label>
+      <input id="value" type="text" pInputText [(ngModel)]="field.value" class="w-full" placeholder="Enter value">
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" label="Cancel" icon="pi pi-times" (click)="onCancel()" class="p-button-text">
+    </button>
+    <button pButton type="button" label="Save" icon="pi pi-check" (click)="onSave()"
+      [disabled]="!field.label || !field.formControl" class="p-button-text">
+    </button>
+  </ng-template>
+</p-dialog>

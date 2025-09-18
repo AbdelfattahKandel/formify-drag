@@ -1,0 +1,16 @@
+@if (formControlInst()) {
+  <p-colorPicker
+    [formControl]="formControlInst()!"
+    styleClass="w-full"
+  ></p-colorPicker>
+} @else if (controlName()) {
+  <p-colorPicker
+    [formControlName]="controlName()!"
+    styleClass="w-full"
+  ></p-colorPicker>
+} @else {
+  <p-colorPicker
+    [disabled]="true"
+    styleClass="w-full"
+  ></p-colorPicker>
+}

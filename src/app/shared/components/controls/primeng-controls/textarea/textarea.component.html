@@ -1,0 +1,22 @@
+@if (formControlInst()) {
+  <textarea
+    pTextarea
+    [formControl]="formControlInst()!"
+    [placeholder]="(field().placeholder ?? field().label) ?? ''"
+    class="w-full"
+  ></textarea>
+} @else if (controlName()) {
+  <textarea
+    pTextarea
+    [formControlName]="controlName()!"
+    [placeholder]="(field().placeholder ?? field().label) ?? ''"
+    class="w-full"
+  ></textarea>
+} @else {
+  <textarea
+    pTextarea
+    [placeholder]="(field().placeholder ?? field().label) ?? ''"
+    class="w-full"
+    disabled
+  ></textarea>
+}

@@ -1,0 +1,99 @@
+.cdk-drag-preview {
+    opacity: 0.8;
+    box-shadow: none;
+    padding: 0;
+  }
+  
+  .cdk-drag-placeholder {
+    opacity: 0.5;
+    border: none;
+    min-height: auto;
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+  
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+  
+  .cdk-drop-list-dragging .cdk-drag {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+  
+  /* Canvas container */
+  .canvas-container {
+    min-height: 80vh;
+    padding: 1rem;
+    border: none;
+  }
+  
+  .canvas-container.cdk-drop-list-dragging {
+    border: none;
+  }
+  
+  /* Grid layout for form fields */
+  #canvas {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    align-content: start;
+    min-height: 200px;
+  }
+  
+  
+  
+  
+  
+  /* Column indicator styles */
+  .column-indicator {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 10px;
+    z-index: 5;
+    pointer-events: none;
+  }
+  
+  
+  
+  /* Field type indicator styles */
+  .field-type-indicator {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    right: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 4px;
+    border-radius: 4px;
+    text-align: center;
+    text-transform: capitalize;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+    transition: all 0.2s ease;
+  }
+  
+  
+  
+  /* Responsive grid */
+  @media (max-width: 1024px) {
+    #canvas {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    #canvas {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    #canvas {
+      grid-template-columns: 1fr;
+    }
+  }

@@ -1,0 +1,111 @@
+<div class="flex gap-4 h-full">
+    <!-- Left Sidebar: controls + palette -->
+      <!-- <h3 class="text-lg font-semibold mb-4">Form Elements</h3> -->
+    <div class="w-[20vw]  ">
+      <div class="rounded-lg shadow min-h-[90vh] ">
+      <p-selectbutton
+        [formControl]="selectionCtrl"
+        [options]="tabs"
+        optionLabel="label"
+        optionValue="value"
+        [allowEmpty]="false"
+        styleClass="w-full"
+        size="large"
+        style="width: 100%; margin: auto;"
+
+      >
+        <ng-template pTemplate="item" let-tab>
+          <span class="flex items-center gap-2"> 
+            <i [class]="tab.icon"></i>
+            <span>{{ tab.label }}</span>
+          </span>
+        </ng-template>
+      </p-selectbutton>
+
+      <div class="rounded-lg overflow-auto">
+       
+        <div 
+          cdkDropList 
+          id="palette" 
+          [cdkDropListData]="paletteTools" 
+          [cdkDropListConnectedTo]="['canvas']"
+          class="space-y-2"
+        >
+          <app-palette [tools]="paletteTools" (itemDragged)="onItemDragged($event)"></app-palette>
+        </div>
+      </div>
+    </div>
+    </div>
+    <!-- Palette -->
+    
+  
+    <!-- Canvas -->
+    <div class="flex-1 p-4 border border-gray-300 rounded-lg">
+      <div class=" rounded-lg shadow p-6 min-h-[90vh] ">
+        <div class="flex justify-between items-center mb-6 border border-gray-400 rounded-lg p-6">
+          <div class="grid grid-cols-2">
+          <h3 class="text-3xl font-semibold">{{title}}</h3>
+          <input
+            pInputText
+            type="text"
+            class="w-[100%] p-2 border rounded col-span-2"
+            placeholder="FormGroup"
+            [(ngModel)]="title"
+            [ngModelOptions]="{ standalone: true }"
+          />
+        </div>
+          <div class="flex gap-2">
+            <button pButton icon="pi pi-cog" label="Edit Selected" [disabled]="!selectedField"
+              (click)="selectedField && openFieldEditor(selectedField)" class="p-button-sm">
+            </button>
+            <p-button icon="pi pi-trash" label="Remove Selected" [disabled]="!selectedField"
+              (onClick)="removeSelectedField()" styleClass="p-button-sm p-button-danger">
+            </p-button>
+            <p-button icon="pi pi-code" label="Generate JSON" (onClick)="generateJson()"
+              styleClass="p-button-sm p-button-success">
+            </p-button>
+          </div>
+        </div>
+  
+        <div cdkDropList id="canvas" [cdkDropListData]="droppedTools" [cdkDropListConnectedTo]="['palette']"
+          (cdkDropListDropped)="drop($event)" class="canvas-container">
+  
+          @if (droppedTools.length === 0) {
+          <div class="col-span-4 flex flex-col items-center justify-center text-gray-400 py-16">
+            <i class="pi pi-arrow-left text-4xl mb-4"></i>
+            <p class="text-lg">Drag and drop elements here</p>
+            <p class="text-sm">or click on any element in the left panel</p>
+          </div>
+          }
+  
+          @for (tool of droppedTools; track tool.id) {
+          <div cdkDrag [cdkDragData]="tool" (click)="onFieldSelected(tool)" class="field-container"
+               [style.grid-column]="'span ' + (tool.fieldStyle?.columns || 1)"
+               [style.width]="tool.fieldStyle?.width || '100%'">
+            <!-- Field actions removed for minimal UI -->
+            
+            <form [formGroup]="formGroup" class="w-full">
+              <app-rerender 
+                [field]="tool" 
+                [isEditMode]="isEditMode" 
+                [isRowSelected]="selectedField?.id === tool.id"
+                [formGroup]="formGroup"
+                (editRequested)="openFieldEditor(tool)">
+              </app-rerender>
+            </form>
+
+          </div>}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Field Editor Modal -->
+  @if (showFieldEditor && selectedField) {
+    <app-field-editor-mode
+      [field]="selectedField!"
+      [(visible)]="showFieldEditor"
+      (save)="onFieldSaved($event)"
+      (cancel)="showFieldEditor = false"
+    ></app-field-editor-mode>
+  }

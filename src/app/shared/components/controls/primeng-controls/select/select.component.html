@@ -1,0 +1,31 @@
+@if (formControlInst()) {
+  <p-select
+    [formControl]="formControlInst()!"
+    [options]="options()"
+    optionLabel="label"
+    optionValue="value"
+    [showClear]="true"
+    styleClass="w-full"
+    [placeholder]="(field().placeholder ?? field().label) ?? ''"
+  ></p-select>
+} @else if (controlName()) {
+  <p-select
+    [formControlName]="controlName()!"
+    [options]="options()"
+    optionLabel="label"
+    optionValue="value"
+    [showClear]="true"
+    styleClass="w-full"
+    [placeholder]="(field().placeholder ?? field().label) ?? ''"
+  ></p-select>
+} @else {
+  <p-select
+    [options]="options()"
+    optionLabel="label"
+    optionValue="value"
+    [showClear]="true"
+    styleClass="w-full"
+    [placeholder]="(field().placeholder ?? field().label) ?? ''"
+    [disabled]="true"
+  ></p-select>
+}

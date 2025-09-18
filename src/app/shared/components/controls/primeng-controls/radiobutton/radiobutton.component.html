@@ -1,0 +1,43 @@
+@if (formControlInst()) {
+  <div class="flex flex-col gap-2">
+    @for (opt of options(); track $index) {
+      <div class="flex items-center gap-2">
+        <p-radioButton
+          [formControl]="formControlInst()!"
+          [value]="opt.value"
+          [inputId]="inputId($index)"
+          [name]="(field().key || field().id || 'radio') + ''"
+        ></p-radioButton>
+        <label [for]="inputId($index)">{{ opt.label ?? opt.value }}</label>
+      </div>
+    }
+  </div>
+} @else if (controlName()) {
+  <div class="flex flex-col gap-2">
+    @for (opt of options(); track $index) {
+      <div class="flex items-center gap-2">
+        <p-radioButton
+          [formControlName]="controlName()!"
+          [value]="opt.value"
+          [inputId]="inputId($index)"
+          [name]="(field().key || field().id || 'radio') + ''"
+        ></p-radioButton>
+        <label [for]="inputId($index)">{{ opt.label ?? opt.value }}</label>
+      </div>
+    }
+  </div>
+} @else {
+  <div class="flex flex-col gap-2">
+    @for (opt of options(); track $index) {
+      <div class="flex items-center gap-2">
+        <p-radioButton
+          [value]="opt.value"
+          [inputId]="inputId($index)"
+          [name]="(field().key || field().id || 'radio') + ''"
+          [disabled]="true"
+        ></p-radioButton>
+        <label class="opacity-50" [for]="inputId($index)">{{ opt.label ?? opt.value }}</label>
+      </div>
+    }
+  </div>
+}

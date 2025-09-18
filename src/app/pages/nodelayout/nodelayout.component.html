@@ -1,0 +1,29 @@
+<nav class="w-[99vw] mx-auto border-b border-gray-400 backdrop-blur py-1 ">
+  <div class="max-w-[100vw] mx-auto h-16 px-4 flex items-center justify-between">
+    <h1 class="text-xl sm:text-2xl font-bold tracking-tight">Formify</h1>
+    <div class="flex items-center gap-2">
+      <button type="button" class="inline-flex items-center gap-2 rounded-md border border-yellow-500 px-3 py-1.5 text-sm text-yellow-500 focus:outline-none focus-visible:ring-2" (click)="toggleTheme()">
+        <i [ngClass]="darkIcon"></i>
+      </button>
+      <p-button 
+        type="button" 
+        styleClass="h-8 w-24 p-button-outlined border " 
+        [style]="{ 
+          'border-color': '#eab308',
+          'color': '#eab308',
+          'background-color': 'transparent'
+        }"
+        icon="pi pi-save" 
+        iconPos="left" 
+        label="Save"
+      ></p-button>
+    </div>
+  </div>
+</nav>
+
+<main class="grid grid-cols-4 w-[99vw] h-[calc(99vh-5rem)] mx-auto">
+  <section class="col-span-4 border-l border-gray-200 p-4 space-y-4">
+    <app-canvas></app-canvas>
+
+  </section>
+</main>

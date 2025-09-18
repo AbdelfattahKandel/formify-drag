@@ -1,0 +1,19 @@
+@if (formControlInst()) {
+  <p-datepicker
+    [formControl]="formControlInst()!"
+    styleClass="w-full"
+    [showIcon]="true"
+  ></p-datepicker>
+} @else if (controlName()) {
+  <p-datepicker
+    [formControlName]="controlName()!"
+    styleClass="w-full"
+    [showIcon]="true"
+  ></p-datepicker>
+} @else {
+  <p-datepicker
+    [disabled]="true"
+    styleClass="w-full"
+    [showIcon]="true"
+  ></p-datepicker>
+}
