@@ -38,15 +38,24 @@ export class FieldFactoryService {
       };
     }
 
-    // if (original.kind === 'array') {
-    //   return { 
-    //     kind: 'array', 
-    //     id: baseId, 
-    //     key: baseKey, 
-    //     children: [], 
-    //     label: original.label || 'Array' 
-    //   };
-    // }
+    // Preserve arrays as containers and keep their formControl as entered (for JSON export)
+    if (original.kind === 'array' || (original as any).type === 'array') {
+      const clonedChildren = Array.isArray((original as any).children)
+        ? JSON.parse(JSON.stringify((original as any).children))
+        : [];
+      const cloned: FieldConfig = {
+        kind: 'array',
+        id: baseId,
+        key: baseKey,
+        label: (original as any).label,
+        fieldStyle: this.normalizeStyle((original as any).fieldStyle) as any,
+        // keep the raw formControl name (could be non-Latin) for export
+        ...(original as any).formControl ? { formControl: (original as any).formControl } as any : {},
+        type: (original as any).type,
+        children: clonedChildren as any,
+      } as any;
+      return cloned;
+    }
 
     // Default: treat as control
     const cloned: FieldConfig = {

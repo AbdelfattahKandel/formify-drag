@@ -7,9 +7,9 @@ export const PALETTE_TOOLS: FieldConfig[] = [
     formControl: 'text',
     kind: 'control',
     key: 'text',
-    type: 'input-text' as any,
+    type: 'input-text',
     label: 'Text Input',
-    fieldStyle: { width: '100%' } as any,
+    fieldStyle: { width: '100%' },
     options: [],
   },
   {
@@ -17,9 +17,9 @@ export const PALETTE_TOOLS: FieldConfig[] = [
     formControl: 'password',
     kind: 'control',
     key: 'password',
-    type: 'password' as any,
+    type: 'password',
     label: 'Password',
-    fieldStyle: { width: '100%' } as any,
+    fieldStyle: { width: '100%' },
     options: [],
   },
   {
@@ -27,9 +27,9 @@ export const PALETTE_TOOLS: FieldConfig[] = [
     formControl: 'email',
     kind: 'control',
     key: 'email',
-    type: 'input-text' as any,
+    type: 'input-text',
     label: 'Email',
-    fieldStyle: { width: '100%' } as any,
+    fieldStyle: { width: '100%' },
     options: [],
   },
 
@@ -42,9 +42,9 @@ export const PALETTE_TOOLS: FieldConfig[] = [
     formControl: 'input_number',
     kind: 'control',
     key: 'input_number',
-    type: 'input-number' as any,
+    type: 'input-number',
     label: 'Number',
-    fieldStyle: { width: '100%' } as any,
+    fieldStyle: { width: '100%' },
     options: [],
   },
 
@@ -54,9 +54,9 @@ export const PALETTE_TOOLS: FieldConfig[] = [
     formControl: 'date',
     kind: 'control',
     key: 'date',
-    type: 'datepicker' as any,
+    type: 'datepicker',
     label: 'Date Picker',
-    fieldStyle: { width: '100%' } as any,
+    fieldStyle: { width: '100%' },
     options: [],
   },
   {
@@ -64,9 +64,9 @@ export const PALETTE_TOOLS: FieldConfig[] = [
     formControl: 'textarea',
     kind: 'control',
     key: 'textarea',
-    type: 'textarea' as any,
+    type: 'textarea',
     label: 'Textarea',
-    fieldStyle: { width: '100%' } as any,
+    fieldStyle: { width: '100%' },
     options: [],
   },
   {
@@ -74,9 +74,9 @@ export const PALETTE_TOOLS: FieldConfig[] = [
     formControl: 'select',
     kind: 'control',
     key: 'select',
-    type: 'select' as any,
+    type: 'select',
     label: 'Select',
-    fieldStyle: { width: '100%' } as any,
+    fieldStyle: { width: '100%' },
     options: [
       { label: 'Option 1', value: 'option1' },
       { label: 'Option 2', value: 'option2' },
@@ -87,9 +87,9 @@ export const PALETTE_TOOLS: FieldConfig[] = [
     formControl: 'multi_select',
     kind: 'control',
     key: 'multi_select',
-    type: 'multi-select' as any,
+    type: 'multi-select',
     label: 'Multi Select',
-    fieldStyle: { width: '100%' } as any,
+    fieldStyle: { width: '100%' },
     options: [
       { label: 'Option 1', value: 'option1' },
       { label: 'Option 2', value: 'option2' },
@@ -100,9 +100,9 @@ export const PALETTE_TOOLS: FieldConfig[] = [
     formControl: 'radio',
     kind: 'control',
     key: 'radio',
-    type: 'radio' as any,
+    type: 'radio',
     label: 'Radio',
-    fieldStyle: { width: '100%' } as any,
+    fieldStyle: { width: '100%' },
     options: [
       { label: 'Option 1', value: 'option1' },
       { label: 'Option 2', value: 'option2' },
@@ -113,9 +113,21 @@ export const PALETTE_TOOLS: FieldConfig[] = [
     formControl: 'checkbox',
     kind: 'control',
     key: 'checkbox',
-    type: 'checkbox' as any,
+    type: 'checkbox',
     label: 'Checkbox',
-    fieldStyle: { width: '100%' } as any,
+    fieldStyle: { width: '100%' },
+    options: [],
+  },
+
+  // Image Field (uses FormArray of filenames + runtime previews)
+  {
+    id: 'imagefield-1',
+    formControl: 'images',
+    kind: 'control',
+    key: 'images',
+    type: 'imagefield' as any,
+    label: 'Images',
+    fieldStyle: { width: '100%' },
     options: [],
   },
 
@@ -125,9 +137,20 @@ export const PALETTE_TOOLS: FieldConfig[] = [
     kind: 'group',
     key: 'group',
     type: 'group' as any,
-    label: 'Group',
-    fieldStyle: { columns: 12, width: '100%' } as any,
+    label: 'Group' ,
+    fieldStyle: { columns: 4, width: '100%' },
     children: {}
+  },
+
+  // Array container
+  {
+    id: 'array-1',
+    kind: 'array',
+    key: 'items',
+    type: 'array' as any,
+    label: 'Array',
+    fieldStyle: { columns: 4, width: '100%' },
+    children: []
   },
 
 

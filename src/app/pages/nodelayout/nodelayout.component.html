@@ -1,21 +1,41 @@
 <nav class="w-[99vw] mx-auto border-b border-gray-400 backdrop-blur py-1 ">
   <div class="max-w-[100vw] mx-auto h-16 px-4 flex items-center justify-between">
-    <h1 class="text-xl sm:text-2xl font-bold tracking-tight">Formify</h1>
+    <div class="flex items-center gap-3">
+      <!-- Brand Logo (theme-aware) -->
+      <svg
+        class="w-10 h-10 sm:w-12 sm:h-12"
+        style="color: var(--p-primary-color)"
+        viewBox="0 0 64 64"
+        role="img"
+        aria-labelledby="formifyLogoTitle"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <title id="formifyLogoTitle">Formify Logo</title>
+        <!-- Rounded container uses Prime surface token, falls back if undefined -->
+        <rect x="4" y="4" width="56" height="56" rx="14" fill="var(--p-surface-800, #1f2937)"/>
+        <!-- Stylized F uses currentColor which is bound to --p-primary-color -->
+        <path d="M22 20h20a3 3 0 0 1 0 6H28v6h10a3 3 0 0 1 0 6H28v10a3 3 0 0 1-6 0V23a3 3 0 0 1 0-3z" fill="currentColor"/>
+        <!-- Accent tick uses highlight BG to adapt to theme -->
+        <path d="M42 40l6 0c2.2 0 4 1.8 4 4v4c0 1.1-.9 2-2 2h-8c-1.1 0-2-.9-2-2v-6c0-1.1.9-2 2-2z" fill="var(--p-highlight-bg, #fde68a)" opacity="0.6"/>
+      </svg>
+      <span class="text-2xl sm:text-3xl font-bold tracking-tight" style="color: var(--p-text-color)">Formify</span>
+    </div>
     <div class="flex items-center gap-2">
       <button type="button" class="inline-flex items-center gap-2 rounded-md border border-yellow-500 px-3 py-1.5 text-sm text-yellow-500 focus:outline-none focus-visible:ring-2" (click)="toggleTheme()">
         <i [ngClass]="darkIcon"></i>
       </button>
       <p-button 
         type="button" 
-        styleClass="h-8 w-24 p-button-outlined border " 
+        styleClass="h-8 w-[36] p-button-outlined border " 
         [style]="{ 
-          'border-color': '#eab308',
-          'color': '#eab308',
+          'border-color': 'var(--p-primary-color)',
+          'color': 'var(--p-primary-color)',
           'background-color': 'transparent'
         }"
-        icon="pi pi-save" 
+        icon="pi pi-download" 
         iconPos="left" 
-        label="Save"
+        label="Download JSON"
+        (onClick)="canvasRef.downloadJson()"
       ></p-button>
     </div>
   </div>
@@ -23,7 +43,7 @@
 
 <main class="grid grid-cols-4 w-[99vw] h-[calc(99vh-5rem)] mx-auto">
   <section class="col-span-4 border-l border-gray-200 p-4 space-y-4">
-    <app-canvas></app-canvas>
+    <app-canvas #canvasRef></app-canvas>
 
   </section>
 </main>

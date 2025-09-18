@@ -1,8 +1,27 @@
 <div class="space-y-3" [formGroupName]="groupKey()">
-  @if (groupLabel()) {
-    <h4 class="text-base font-semibold">{{ groupLabel() }}</h4>
-  }
+  <!-- Header with Add Subgroup button -->
+  <div class="flex items-center justify-between mb-2">
+    @if (groupLabel()) {
+      <h4 class="text-base font-semibold">{{ groupLabel() }}</h4>
+    }
+    <p-button
+      icon="pi pi-plus"
+      label="Add Group"
+      styleClass="p-button-sm p-button-outlined"
+      (onClick)="openAddGroupDialog()">
+    </p-button>
+  </div>
 
+  <!-- Quick add toolbar for fields inside this group -->
+  <div class="flex flex-wrap items-center gap-2 mb-3">
+    <p-button label="Text" styleClass="p-button-sm p-button-secondary" (onClick)="addPreset('input-text')" />
+    <p-button label="Textarea" styleClass="p-button-sm p-button-secondary" (onClick)="addPreset('textarea')" />
+    <p-button label="Select" styleClass="p-button-sm p-button-secondary" (onClick)="addPreset('select')" />
+    <p-button label="Checkbox" styleClass="p-button-sm p-button-secondary" (onClick)="addPreset('checkbox')" />
+    <p-button label="Images" styleClass="p-button-sm p-button-secondary" (onClick)="addPreset('imagefield')" />
+  </div>
+
+  <!-- Drop list container -->
   <div
     cdkDropList
     [id]="'group-' + groupKey()"
@@ -14,15 +33,50 @@
     <div class="grid grid-cols-12 gap-4">
       @for (child of children(); track child.id ?? child.key ?? $index) {
         @if (child.kind === 'group') {
-          <div class="col-span-12">
-            <app-container-formgroup [group]="child"></app-container-formgroup>
+          <div class="col-span-12" cdkDrag [cdkDragData]="child">
+            <div class="flex items-start gap-2">
+              <span cdkDragHandle class="pi pi-bars cursor-move mt-1 text-gray-500"></span>
+              <div class="flex-1">
+                <app-container-formgroup [group]="child"></app-container-formgroup>
+              </div>
+            </div>
           </div>
         } @else {
-          <div class="col-span-12">
-            <app-rerender [field]="child"></app-rerender>
+          <div class="col-span-12" cdkDrag [cdkDragData]="child">
+            <div class="flex items-start gap-2">
+              <span cdkDragHandle class="pi pi-bars cursor-move mt-1 text-gray-500"></span>
+              <div class="flex-1">
+                <app-rerender [field]="child"></app-rerender>
+              </div>
+            </div>
           </div>
         }
       }
     </div>
   </div>
-</div>
+ </div>
+
+<!-- Add Group Dialog -->
+<p-dialog
+  [visible]="showAddDialog()"
+  (onHide)="closeAddGroupDialog()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  header="Add Inner Group"
+  [style]="{ width: '28rem' }">
+  <form [formGroup]="addGroupForm" class="space-y-4" (ngSubmit)="confirmAddGroup()">
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium">Group Name</label>
+      <input pInputText formControlName="groupName" placeholder="Enter group name" />
+      @if (addGroupForm.controls['groupName'].invalid && addGroupForm.controls['groupName'].touched) {
+        <small class="text-red-500">Name is required (min 2 chars)</small>
+      }
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2">
+      <p-button label="Cancel" styleClass="p-button-text" (onClick)="closeAddGroupDialog()" />
+      <p-button label="Add" icon="pi pi-check" [disabled]="addGroupForm.invalid" (onClick)="confirmAddGroup()" />
+    </div>
+  </form>
+</p-dialog>

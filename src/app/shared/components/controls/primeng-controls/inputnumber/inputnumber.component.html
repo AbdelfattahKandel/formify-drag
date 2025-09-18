@@ -2,17 +2,20 @@
   <p-inputNumber
     [formControl]="formControlInst()!"
     inputStyleClass="w-full"
+    styleClass="w-full"
     [placeholder]="(field().placeholder ?? field().label) ?? ''"
   ></p-inputNumber>
 } @else if (controlName()) {
   <p-inputNumber
     [formControlName]="controlName()!"
+    styleClass="w-full"
     inputStyleClass="w-full"
     [placeholder]="(field().placeholder ?? field().label) ?? ''"
   ></p-inputNumber>
 } @else {
   <p-inputNumber
     [disabled]="true"
+    styleClass="w-full"
     inputStyleClass="w-full"
     [placeholder]="(field().placeholder ?? field().label) ?? ''"
   ></p-inputNumber>

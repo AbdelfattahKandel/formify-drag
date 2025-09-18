@@ -1,59 +1,105 @@
-# FormifyDrag
+# Formify Drag & Build (Angular 19 + PrimeNG 19 + TailwindCSS 4)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.16.
+Formify is a drag-and-drop form builder powered by Angular 19, PrimeNG 19, and Tailwind 4. Build forms visually, edit fields, nest groups, and export your schema as JSON.
 
-## Development server
+## Tech Stack
+- Angular 19 (standalone components, OnPush)
+- PrimeNG 19 (+ Prime Icons, themes)
+- TailwindCSS 4
+- CDK Drag & Drop
 
-To start a local development server, run:
-
+## Quick Start
 ```bash
-ng serve
+npm install
+npm start    # alias for: ng serve
+```
+Open http://localhost:4200
+
+## NPM Scripts
+- `npm start` – run dev server
+- `npm run build` – production build
+- `npm run L` or `ng lint` – lint (if configured)
+
+## Project Structure
+```
+src/app/
+ ├─ core/                 # services, models, providers
+ ├─ shared/               # reusable controls/components
+ │   └─ components/
+ │       ├─ controls/primeng-controls/*   # PrimeNG-based form controls
+ │       ├─ container-formgroup/          # nested FormGroup container
+ │       └─ field-editor-mode/            # field editor modal
+ ├─ pages/
+ │   └─ templetes/
+ │       ├─ canvas/                       # palette + canvas + export
+ │       ├─ rerender/                     # renderer that paints a field by type
+ │       └─ ...
+ └─ pages/nodelayout/                     # app shell (toolbar, theme toggle)
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Key Features
+- Drag & Drop from palette to canvas
+- Renderer paints fields by canonical `type` (`input-text`, `password`, `select`, `radio`, `checkbox`, `input-number`, `datepicker`, `textarea`, `colorpicker`, `group`)
+- Nested `group` containers using `[formGroupName]` and CDK drop zones (add controls or groups inside groups)
+- Field Editor modal:
+  - Edit label, key, type, columns, width, options, required, placeholder, value
+  - Live value sync: typing in editor updates reactive FormControl immediately
+- Download JSON: exports current schema including live control values
 
-## Code scaffolding
+## Architecture & Conventions
+- Standalone components only. All with `ChangeDetectionStrategy.OnPush`.
+- Reactive Forms everywhere. Template-driven forms avoided except in editor UI (ngModel) which emits events to update reactive state.
+- Business logic in services under `core/services`.
+- Renderer uses Angular 19 template control flow `@switch`, `@case`, `@if`, `@for`.
+- Tailwind utility classes for layout/spacing/typography. Prefer CSS variables from PrimeNG for theming.
+- Avoid `ngClass`/`ngStyle` where possible; prefer `[class]`/`[style]` bindings or Tailwind classes.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Coding Guidelines Summary
+- Angular CLI generators (examples):
+  - `ng g c shared/components/...`  `ng g s core/services/...`  `ng g i core/models/...`
+- Strict typing, avoid `any` (except temporary migration spots)
+- Signals for local state where suitable; services + RxJS for shared state
+- Import PrimeNG modules directly in standalone components
+- Keep components small and focused
 
-```bash
-ng generate component component-name
-```
+## How to Use
+1) Drag a control from the left palette onto the canvas
+2) Select a control and press “Edit Selected” to open the Field Editor
+3) Change properties; value changes are synced live to the reactive form
+4) Use “Download JSON” to export the current schema
+5) Use `group` from palette to create nested sections; drop fields/groups inside
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Theming
+The shell header logo and buttons use PrimeNG CSS variables so it adapts automatically to light/dark theme:
+- `--p-primary-color`, `--p-text-color`, `--p-surface-800`, `--p-highlight-bg`
 
-```bash
-ng generate --help
-```
+## Current Audit (vs internal guidelines)
+- ✅ Standalone components, OnPush used broadly (`RerenderComponent`, controls, group container)
+- ✅ Renderer uses Angular 19 `@switch/@case` and `@if/@for`
+- ✅ PrimeNG 19 components imported locally per standalone component
+- ✅ Drag-and-drop containers wired via CDK
+- ✅ Live value sync from Field Editor to Reactive Form
+- ✅ JSON export (download) reflects live values
 
-## Building
+Action items to improve consistency
+- [nodelayout/nodelayout.component.html]
+  - Replace leftover inline `[style]` bindings on buttons with Tailwind + theme classes, or move to CSS using variables
+  - Replace `[ngClass]="darkIcon"` with `[class]` bound to a computed class string, or use Tailwind’s dark: variants if possible
+- Replace remaining `as any` casts with proper types in:
+  - `shared/components/controls/*` helper methods and field access
+  - `pages/templetes/canvas/*` (e.g., updating `droppedTools`)
+- Ensure every control template avoids mixed inline styles; use `styleClass`/`inputStyleClass` and Tailwind utilities
+- Consider adding ESLint config to enforce OnPush, standalone, and no `any`
+- Add unit tests for:
+  - Field Editor save + live value sync
+  - Group nesting builder (`createformbuilder.service`)
+  - JSON export schema
 
-To build the project run:
+## Contributing
+1) Create a branch
+2) Follow guidelines above (standalone + OnPush, Reactive Forms, Tailwind, no `any`)
+3) Run Prettier before commit
+4) Open a PR
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## License
+MIT (c) 2025 Formify Team

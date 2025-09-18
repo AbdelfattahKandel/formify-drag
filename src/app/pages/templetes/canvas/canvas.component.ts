@@ -315,6 +315,42 @@ export class CanvasComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Download the current form schema as a JSON file. This syncs current FormGroup
+  // control values into droppedTools so the output reflects live values.
+  downloadJson() {
+    try {
+      // Sync values from reactive form into droppedTools (controls only)
+      this.droppedTools = this.droppedTools.map(f => {
+        if (typeof f.formControl === 'string') {
+          const ctrl = this.formGroup.get(f.formControl) as FormControl | null;
+          if (ctrl) {
+            return { ...(f as any), value: ctrl.value } as FieldConfig;
+          }
+        }
+        return f;
+      });
+
+      const formSchema: FormSchema = this.formBuilderService.buildExportSchema(this.droppedTools, this.title);
+      const json = exportSchema(formSchema);
+
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const name = (this.title && this.title.trim()) ? this.title.trim() : 'form';
+      a.download = `${name}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      this.messageService.add({ severity: 'success', summary: 'Download', detail: 'JSON downloaded successfully.' });
+    } catch (error) {
+      console.error('Error downloading JSON:', error);
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to download JSON.' });
+    }
+  }
+
   openFieldEditor(field: FieldConfig) {
     if (!field) return;
     this.selectedField = field;

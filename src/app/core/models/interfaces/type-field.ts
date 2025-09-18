@@ -28,4 +28,5 @@ export type FieldType =
     | 'textarea'          // TextareaModule
     | 'toggle-button'     // ToggleButtonModule
     | 'toggle-switch'     // ToggleSwitchModule
-    | 'tree-select';      // TreeSelectModule
+    | 'tree-select'       // TreeSelectModule
+    | 'imagefield';       // Custom Image Field (FormArray of filenames)

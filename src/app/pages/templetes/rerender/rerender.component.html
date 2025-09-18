@@ -17,7 +17,13 @@
     @case('toggle-button') { <app-togglebutton></app-togglebutton> }
     @case('toggle-switch') { <app-toggleswitch></app-toggleswitch> }
     @case('group') { <app-container-formgroup [group]="field"></app-container-formgroup> }
-   
+    @case('array') { <app-container-formarray [array]="field"></app-container-formarray> }
+    @case('imagefield') {
+      <app-imagefield
+        [field]="field"
+        [imagesInput]="getFormArray(field)">
+      </app-imagefield>
+    }
     
 
     

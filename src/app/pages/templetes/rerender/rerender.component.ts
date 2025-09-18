@@ -1,5 +1,5 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, SimpleChanges, forwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormArray, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { FieldConfig } from '../../../core/models/interfaces/legacy-extras';
@@ -20,6 +20,8 @@ import { TextareaComponent } from '../../../shared/components/controls/primeng-c
 import { TogglebuttonComponent } from '../../../shared/components/controls/primeng-controls/togglebutton/togglebutton.component';
 import { ToggleswitchComponent } from '../../../shared/components/controls/primeng-controls/toggleswitch/toggleswitch.component';
 import { ContainerFormgroupComponent } from '../../../shared/components/container-formgroup/container-formgroup.component';
+import { ContainerFormarrayComponent } from '../../../shared/components/container-formarray/container-formarray.component';
+import { ImagefieldComponent } from "../../../shared/components/controls/primeng-controls/imagefield/imagefield.component";
 
 
 
@@ -35,7 +37,6 @@ import { ContainerFormgroupComponent } from '../../../shared/components/containe
     CommonModule,
     ReactiveFormsModule,
     // PrimeNG Control Components
-
     CheckboxComponent,
     ColorpickerComponent,
     DatepickerComponent,
@@ -49,8 +50,10 @@ import { ContainerFormgroupComponent } from '../../../shared/components/containe
     TextareaComponent,
     TogglebuttonComponent,
     ToggleswitchComponent,
-    // ContainerFormgroupComponent,
-    ContainerFormgroupComponent,
+    // Container containers (wrapped to avoid circular import eval order)
+    forwardRef(() => ContainerFormgroupComponent),
+    forwardRef(() => ContainerFormarrayComponent),
+    ImagefieldComponent
   ],
   templateUrl: './rerender.component.html',
   styleUrl: './rerender.component.css',
@@ -98,37 +101,57 @@ export class RerenderComponent {
   }
 
   initializeField(): void {
-    // Initialize or update the form control in the parent form group
-    if (this.field && this.field.formControl) {
-      const key = this.field.formControl as unknown;
-      if (typeof key !== 'string') return;
-      const existing = this.formGroup.get(key);
-      if (this.getType() === 'image') {
-        // Ensure a FormArray exists for image inputs
-        if (!existing) {
-          this.formGroup.addControl(key, new FormArray([]));
-        }
-        // Normalize FieldConfig.value to an array
-        if (!Array.isArray(this.field.value)) {
-          this.field.value = this.field.value ? [this.field.value as any] : [];
-        }
+    if (!this.field) return;
+
+    const isGroup = (this.field as any).kind === 'group';
+    // For groups, prefer formControl if provided; fallback to key or id
+    const groupKey = isGroup
+      ? (typeof (this.field as any).formControl === 'string'
+          ? (this.field as any).formControl as string
+          : String((this.field as any).key || (this.field as any).id || ''))
+      : null;
+    // For normal controls, use formControl name
+    const controlKey = !isGroup ? (typeof this.field.formControl === 'string' ? this.field.formControl as string : '') : '';
+
+    // Decide the name we will use in the parent FormGroup
+    const name = isGroup ? groupKey : controlKey;
+    if (!name) return;
+
+    const existing = this.formGroup.get(name);
+
+    if (isGroup) {
+      if (!existing) {
+        this.formGroup.addControl(name, new FormGroup({}));
+      }
+      return;
+    }
+
+    if (this.getType() === 'imagefield') {
+      // Ensure a FormArray exists for image inputs
+      if (!existing) {
+        this.formGroup.addControl(name, new FormArray([]));
+      }
+      // Normalize FieldConfig.value to an array
+      if (!Array.isArray(this.field.value)) {
+        this.field.value = this.field.value ? [this.field.value as any] : [];
+      }
+      return;
+    }
+
+    const control = existing as FormControl | null;
+    if (!control) {
+      // If control doesn't exist, create it with disabled state if needed
+      const newControl = new FormControl({
+        value: this.field.value || null,
+        disabled: this.field.disabled || false
+      });
+      this.formGroup.addControl(name, newControl);
+    } else if (this.field.disabled !== undefined) {
+      // Update disabled state if changed
+      if (this.field.disabled) {
+        control.disable();
       } else {
-        const control = existing as FormControl | null;
-        if (!control) {
-          // If control doesn't exist, create it with disabled state if needed
-          const newControl = new FormControl({
-            value: this.field.value || null,
-            disabled: this.field.disabled || false
-          });
-          this.formGroup.addControl(key, newControl);
-        } else if (this.field.disabled !== undefined) {
-          // Update disabled state if changed
-          if (this.field.disabled) {
-            control.disable();
-          } else {
-            control.enable();
-          }
-        }
+        control.enable();
       }
     }
   }

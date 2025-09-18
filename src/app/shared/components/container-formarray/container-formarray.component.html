@@ -1,1 +1,79 @@
-<p>container-formarray works!</p>
+<div class="space-y-3">
+  <!-- Header with Add Item toolbar -->
+  <div class="flex items-center justify-between mb-2">
+    @if (arrayLabel()) {
+    <h4 class="text-base font-semibold">{{ arrayLabel() }}</h4>
+    }
+    <div class="flex items-center gap-2">
+      <p-button icon="pi pi-plus" label="Add Item" styleClass="p-button-sm p-button-outlined" (onClick)="openAddDialog()"> </p-button>
+      <div class="flex flex-wrap items-center gap-2">
+        @for (tool of QUICK_ADD_ARRAY_TOOLS; track tool.type) {
+          <p-button [label]="tool.label" [styleClass]="tool.styleClass || 'p-button-sm'" (onClick)="onToolClick(tool)" />
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Drop list container for array items -->
+  <div
+    cdkDropList
+    [id]="'array-' + arrayKey()"
+    [cdkDropListData]="items()"
+    (cdkDropListDropped)="onDrop($event)"
+    class="rounded border border-gray-300 p-3"
+  >
+    <div class="grid grid-cols-4 gap-4">
+      @for (item of items(); track item.id ?? item.key ?? $index) {
+      <div class="col-span-2" cdkDrag [cdkDragData]="item">
+        <div class="flex items-start gap-2">
+          <span cdkDragHandle class="pi pi-bars cursor-move mt-1 text-gray-500"></span>
+          <div class="flex-1">
+            <app-rerender
+              [field]="item"
+              [isEditMode]="isEditMode()"
+              [parent]="array()"
+              [formGroup]="effectiveForm">
+            </app-rerender>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Add Item Dialog -->
+<p-dialog
+  [visible]="showAddDialog()"
+  (onHide)="closeAddDialog()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  header="Add Array Item"
+  [style]="{ width: '28rem' }"
+>
+  <form [formGroup]="addItemForm" class="space-y-4" (ngSubmit)="confirmAdd()">
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium">Label</label>
+      <input pInputText formControlName="label" placeholder="Enter item label" />
+      @if (addItemForm.controls['label'].invalid && addItemForm.controls['label'].touched) {
+      <small class="text-red-500">Label is required (min 2 chars)</small>
+      }
+    </div>
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium">Type</label>
+      <select class="p-inputtext p-component" formControlName="type">
+        <option value="input-text">Text</option>
+        <option value="textarea">Textarea</option>
+        <option value="select">Select</option>
+        <option value="checkbox">Checkbox</option>
+        <option value="imagefield">Images</option>
+        <option value="array">Array</option>
+      </select>
+    </div>
+    <div class="flex justify-end gap-2 pt-2">
+      <p-button label="Cancel" styleClass="p-button-text" (onClick)="closeAddDialog()" />
+      <p-button label="Add" icon="pi pi-check" [disabled]="addItemForm.invalid" (onClick)="confirmAdd()" />
+    </div>
+  </form>
+</p-dialog>
