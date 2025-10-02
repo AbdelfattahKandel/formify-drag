@@ -24,13 +24,7 @@
       </span>
     </div>
     <div class="flex items-center gap-2">
-      <button
-        type="button"
-        class="inline-flex items-center gap-2 rounded-md border border-yellow-500 px-3 py-1.5 text-sm text-yellow-500 focus:outline-none focus-visible:ring-2"
-        (click)="toggleTheme()"
-      >
-        <i [ngClass]="darkIcon"></i>
-      </button>
+
       <p-button
         type="button"
         styleClass="h-8 w-[36] p-button-outlined border "
@@ -41,7 +35,6 @@
         }"
         icon="pi pi-download"
         iconPos="left"
-        label="Download JSON"
         (onClick)="canvasRef.downloadJson()"
       ></p-button>
     </div>

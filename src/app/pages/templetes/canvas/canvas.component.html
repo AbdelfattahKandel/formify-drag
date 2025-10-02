@@ -1,84 +1,76 @@
-<div class="flex gap-4 h-full">
-    <!-- Left Sidebar: controls + palette -->
-      <!-- <h3 class="text-lg font-semibold mb-4">Form Elements</h3> -->
-    <div class="w-[20vw]  ">
-      <div class="rounded-lg shadow min-h-[90vh] ">
-      <p-selectbutton
-        [formControl]="selectionCtrl"
-        [options]="tabs"
-        optionLabel="label"
-        optionValue="value"
-        [allowEmpty]="false"
-        styleClass="w-full"
-        size="large"
-        style="width: 100%; margin: auto;"
-
-      >
-        <ng-template pTemplate="item" let-tab>
-          <span class="flex items-center gap-2"> 
-            <i [class]="tab.icon"></i>
-            <span>{{ tab.label }}</span>
-          </span>
-        </ng-template>
-      </p-selectbutton>
-
-      <div class="rounded-lg overflow-auto">
-       
-        <div 
-          cdkDropList 
-          id="palette" 
-          [cdkDropListData]="paletteTools" 
-          [cdkDropListConnectedTo]="['canvas']"
-          class="space-y-2"
-        >
-          <app-palette [tools]="paletteTools" (itemDragged)="onItemDragged($event)"></app-palette>
-        </div>
-      </div>
+<div class="flex gap-2 h-full p-2">
+    <!-- Unified Sidebar: Pages + Groups + Controls -->
+    <div class="w-[23vw]">
+      <app-unified-sidebar
+        [pages]="pages()"
+        [currentPageName]="currentPage()"
+        [groupNames]="currentGroupNames()"
+        [selectedGroup]="selectedGroup()"
+        [paletteTools]="paletteTools"
+        (pageSwitch)="onPageSwitch($event)"
+        (pageAdd)="onPageAdd()"
+        (pageRemove)="onPageRemove($event)"
+        (groupSelect)="onGroupSelect($event)"
+        (groupAdd)="onGroupAdd()"
+        (groupRemove)="onGroupRemove($event)">
+      </app-unified-sidebar>
     </div>
-    </div>
-    <!-- Palette -->
     
   
     <!-- Canvas -->
-    <div class="flex-1 p-4 border border-gray-300 rounded-lg">
-      <div class=" rounded-lg shadow p-6 min-h-[90vh] ">
-        <div class="flex justify-between items-center mb-6 border border-gray-400 rounded-lg p-6">
-          <div class="grid grid-cols-2">
-          <h3 class="text-3xl font-semibold">{{title}}</h3>
-          <input
+    <div class="flex-1 border border-gray-200 rounded-md">
+      <div class="rounded-md shadow-sm p-3 min-h-[90vh]">
+        <!-- Compact Header -->
+        <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-200">
+          <div class="w-64 p-2 text-sm  rounded" ></div>
+          <!-- <input
             pInputText
             type="text"
-            class="w-[100%] p-2 border rounded col-span-2"
-            placeholder="FormGroup"
+            class="w-64 p-2 text-sm border rounded"
+            placeholder="Form Name"
             [(ngModel)]="title"
             [ngModelOptions]="{ standalone: true }"
-          />
-        </div>
-          <div class="flex gap-2">
-            <button pButton icon="pi pi-cog" label="Edit Selected" [disabled]="!selectedField"
-              (click)="selectedField && openFieldEditor(selectedField)" class="p-button-sm">
+          /> -->
+          
+          <div class="flex gap-1">
+            <button pButton icon="pi pi-cog" [disabled]="!selectedField"
+              (click)="selectedField && openFieldEditor(selectedField)" 
+              class="p-button-sm p-button-text"
+              pTooltip="Edit Selected Field" tooltipPosition="bottom">
             </button>
-            <p-button icon="pi pi-trash" label="Remove Selected" [disabled]="!selectedField"
-              (onClick)="removeSelectedField()" styleClass="p-button-sm p-button-danger">
+            <p-button icon="pi pi-trash" [disabled]="!selectedField"
+              (onClick)="removeSelectedField()" 
+              styleClass="p-button-sm p-button-text p-button-danger"
+              pTooltip="Remove Selected" tooltipPosition="bottom">
             </p-button>
-            <p-button icon="pi pi-code" label="Generate JSON" (onClick)="generateJson()"
-              styleClass="p-button-sm p-button-success">
+            <p-button icon="pi pi-code" (onClick)="generateJson()"
+              styleClass="p-button-sm p-button-text p-button-success"
+              pTooltip="Generate JSON" tooltipPosition="bottom">
             </p-button>
-            <p-button icon="pi pi-upload" label="Import JSON" (onClick)="triggerImportJson()"
-              styleClass="p-button-sm">
+            <p-button icon="pi pi-upload" (onClick)="triggerImportJson()"
+              styleClass="p-button-sm p-button-text"
+              pTooltip="Import JSON" tooltipPosition="bottom">
             </p-button>
             <input #importJsonInput type="file" accept="application/json" class="hidden" (change)="onImportJsonSelected($event)" />
           </div>
         </div>
+
+        <!-- Form Group Assignment -->
+        <app-form-group-assign
+          [groupNames]="currentGroupNames()"
+          [selectedGroup]="selectedGroup()"
+          (groupChange)="onGroupSelect($event)"
+          (assignToGroup)="onAssignFormToGroup()">
+        </app-form-group-assign>
   
         <div cdkDropList id="canvas" [cdkDropListData]="droppedTools" [cdkDropListConnectedTo]="['palette']"
           (cdkDropListDropped)="drop($event)" class="canvas-container">
   
           @if (droppedTools.length === 0) {
-          <div class="col-span-4 flex flex-col items-center justify-center text-gray-400 py-16">
-            <i class="pi pi-arrow-left text-4xl mb-4"></i>
-            <p class="text-lg">Drag and drop elements here</p>
-            <p class="text-sm">or click on any element in the left panel</p>
+          <div class="col-span-4 flex flex-col items-center justify-center text-gray-400 py-12">
+            <i class="pi pi-arrow-left text-3xl mb-3"></i>
+            <p class="text-base">Drag and drop elements here</p>
+            <p class="text-xs">or click on any element in the left panel</p>
           </div>
           }
   

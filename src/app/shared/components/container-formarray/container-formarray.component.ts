@@ -9,9 +9,9 @@ import { CreateformbuilderService } from '../../../core/services/formbuilder/cre
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
 import { QUICK_ADD_ARRAY_TOOLS, QuickAddTool, QuickAddType } from '../../../pages/templetes/canvas/config/quick-add-tools';
 import { FormGroupFactoryService } from '../../../core/services/formbuilder/form-group-factory.service';
-// import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-container-formarray',
@@ -28,8 +28,7 @@ import { FormGroupFactoryService } from '../../../core/services/formbuilder/form
     DialogModule,
     InputTextModule,
     ButtonModule,
-    // Self import to allow recursive rendering if needed and mirror group behavior
-    // forwardRef(() => ContainerFormarrayComponent),
+    TooltipModule
   ],
   templateUrl: './container-formarray.component.html',
   styleUrls: ['./container-formarray.component.css'],
@@ -182,6 +181,7 @@ export class ContainerFormarrayComponent implements OnInit {
   // (Search dialog removed): open editor directly from item actions
 
   openEditDialog(field: FieldConfig): void {
+    console.log('✏️ [FormArray] فتح Edit Dialog للـ field:', field.type || field.label);
     this.selectedTemplateField = field;
     this.showFieldEditDialog.set(true);
   }
@@ -193,6 +193,7 @@ export class ContainerFormarrayComponent implements OnInit {
 
   onArrayFieldSaved(updatedField: FieldConfig): void {
     if (!this.selectedTemplateField) return;
+    console.log('💾 [FormArray] حفظ التعديلات على الـ field');
     // Merge back into template children
     const list = this.items();
     const prevName = String(((this.selectedTemplateField as any).formControl || (this.selectedTemplateField as any).key || ''));
@@ -209,11 +210,10 @@ export class ContainerFormarrayComponent implements OnInit {
       // Replace children to trigger CD
       (this.array() as any).children = [...list];
       this.selectedTemplateField = list[idx];
+      console.log('✅ [FormArray] تم تحديث الـ field بنجاح:', updatedField.label || updatedField.type);
       this._cdr.markForCheck();
     }
     this.closeEditDialog();
-    // Exit edit mode so runtime Add Item is available
-    this.arrayEditModeChange.emit(false);
   }
 
   // Provide a non-null FormGroup for template binding
@@ -225,16 +225,36 @@ export class ContainerFormarrayComponent implements OnInit {
   onDrop(event: CdkDragDrop<any>) {
     const parent = this.array();
     const list = this.items();
+    
+    console.log('🔵 [FormArray] onDrop triggered', {
+      previousContainer: event.previousContainer.id,
+      currentContainer: event.container.id,
+      arrayKey: this.arrayKey(),
+      currentItemsCount: list.length
+    });
+    
     if (event.previousContainer === event.container) {
+      // Reordering within same array
+      console.log('🔄 [FormArray] Reordering items within array');
       moveItemInArray(list, event.previousIndex, event.currentIndex);
       (parent as any).children = [...list];
       this._cdr.markForCheck();
       return;
     }
+    
+    // Adding from palette
     const tool = event.item?.data as FieldConfig;
-    if (!tool) return;
+    if (!tool) {
+      console.error('❌ [FormArray] No tool data found');
+      return;
+    }
+    
+    console.log('✅ [FormArray] تم إضافة عنصر جوا الـ Array:', tool.type || tool.label);
     const copied = this._service.createCopiedField(tool as any);
     this._service.addItemToArray(parent, copied);
+    
+    console.log('✅ [FormArray] العناصر بعد الإضافة:', this.items().length, 'عنصر');
+    this._cdr.markForCheck();
   }
 
   // Toolbar actions
@@ -255,6 +275,8 @@ export class ContainerFormarrayComponent implements OnInit {
     const nameRaw = String(this.addItemForm.value.label || '').trim();
     const type = String(this.addItemForm.value.type || 'input-text');
     if (!nameRaw) return;
+    
+    console.log('✅ [FormArray] تم إضافة عنصر جوا الـ Array من Dialog:', { label: nameRaw, type });
     // For arrays: preserve the exact entered label as the formArrayName in JSON (even if non-Latin)
     // We'll still generate a safe key for internal uniqueness, but formControl keeps the raw label.
     const base = type === 'array' ? (this.sanitizeName(nameRaw) || 'items') : this.uniqueBaseFor(type);
@@ -262,17 +284,15 @@ export class ContainerFormarrayComponent implements OnInit {
     const isArray = type === 'array';
     const field: FieldConfig = (isArray
       ? {
-          // id: uuidv4(),
           kind: 'array',
           key: controlName,
-          formControl: nameRaw, // keep raw entered name to appear in JSON
+          formControl: nameRaw,
           type,
           label: nameRaw,
           fieldStyle: { columns: 4, width: '100%' } as any,
           children: []
         }
       : {
-          // id: uuidv4(),
           kind: 'control',
           key: controlName,
           formControl: controlName,
@@ -287,17 +307,18 @@ export class ContainerFormarrayComponent implements OnInit {
     ) as any;
     const copied = this._service.createCopiedField(field as any);
     this._service.addItemToArray(this.array(), copied);
+    console.log('✅ [FormArray] العناصر بعد الإضافة:', this.items().length, 'عنصر');
     this.closeAddDialog();
     this._cdr.markForCheck();
   }
 
   addPreset(type: 'input-text' | 'textarea' | 'select' | 'checkbox' | 'imagefield' | 'array'| 'multi-select' ): void {
+    console.log('✅ [FormArray] تم إضافة عنصر جوا الـ Array من Preset:', type);
     const base = this.uniqueBaseFor(type);
     const name = this.generateUniqueControlName(base);
     const isArray = type === 'array';
     const field: FieldConfig = (isArray
       ? {
-          // id: uuidv4(),
           kind: 'array',
           key: name,
           formControl: name,
@@ -307,7 +328,6 @@ export class ContainerFormarrayComponent implements OnInit {
           children: []
         }
       : {
-          // id: uuidv4(),
           kind: 'control',
           key: name,
           formControl: name,
@@ -322,6 +342,7 @@ export class ContainerFormarrayComponent implements OnInit {
     ) as any;
     const copied = this._service.createCopiedField(field as any);
     this._service.addItemToArray(this.array(), copied);
+    console.log('✅ [FormArray] العناصر بعد الإضافة:', this.items().length, 'عنصر');
     this._cdr.markForCheck();
   }
 
@@ -353,8 +374,7 @@ export class ContainerFormarrayComponent implements OnInit {
       case 'checkbox': return 'checkbox';
       case 'imagefield': return 'images';
       case 'array': return 'items';
-      case 'mullti-select': return 'multiselect'
-
+      case 'multi-select': return 'multiselect';
       default: return 'control';
     }
   }
@@ -366,11 +386,8 @@ export class ContainerFormarrayComponent implements OnInit {
       case 'checkbox': return 'Checkbox';
       case 'imagefield': return 'Images';
       case 'array': return 'Array';
-      case 'mullti-select': return 'multiselect'
+      case 'multi-select': return 'Multi Select';
       default: return type;
     }
   }
-  // toggleEditMode() {
-  //   this.arrayEditMode = !this.arrayEditMode;
-  // }
 }

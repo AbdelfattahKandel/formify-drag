@@ -7,6 +7,8 @@ import { ValidatorConfig } from './validator-config';
 
 export type FormSchema = Omit<SimpleFormSchema, 'root'> & {
     formGroup?: string;
+    groupName?: string;
+    pageName?: string;
     layout?: {
       columns?: number;
       gap?: string;

@@ -1,0 +1,109 @@
+[
+    {
+      "home": {
+        "groups": {
+          "ana": [
+            {
+              "id": "form_863",
+              "formGroup": "form_group",
+              "containerStyle": {
+                "dir": "ltr",
+                "cssClass": "container grid",
+                "columns": 4,
+                "gap": "1rem",
+                "minHeight": "80vh",
+                "width": "100%",
+                "maxWidth": "1400px",
+                "margin": "0 auto",
+                "padding": "2rem",
+                "border": "1px solid #e2e8f0",
+                "borderRadius": "0.5rem",
+                "backgroundColor": "#ffffff",
+                "boxShadow": "0 1px 3px rgba(0, 0, 0, 0.1)"
+              },
+              "controls": [
+                {
+                  "data": {
+                    "formControlName": "text",
+                    "fieldType": "input-text",
+                    "value": null,
+                    "label": "Text Input",
+                    "options": []
+                  },
+                  "style": {
+                    "columns": 2,
+                    "width": "100%"
+                  }
+                },
+                {
+                  "data": {
+                    "formControlName": "password",
+                    "fieldType": "password",
+                    "value": null,
+                    "label": "Password",
+                    "options": []
+                  },
+                  "style": {
+                    "columns": 2,
+                    "width": "100%"
+                  }
+                },
+                {
+                  "data": {
+                    "formControlName": "input_number",
+                    "fieldType": "input-number",
+                    "value": null,
+                    "label": "Number",
+                    "options": []
+                  },
+                  "style": {
+                    "columns": 2,
+                    "width": "100%"
+                  }
+                },
+                {
+                  "data": {
+                    "formControlName": "email",
+                    "fieldType": "input-text",
+                    "value": null,
+                    "label": "Email",
+                    "options": []
+                  },
+                  "style": {
+                    "columns": 2,
+                    "width": "100%"
+                  }
+                },
+                {
+                  "data": {
+                    "formControlName": "date",
+                    "fieldType": "datepicker",
+                    "value": null,
+                    "label": "Date Picker",
+                    "options": []
+                  },
+                  "style": {
+                    "columns": 2,
+                    "width": "100%"
+                  }
+                },
+                {
+                  "data": {
+                    "formControlName": "textarea",
+                    "fieldType": "textarea",
+                    "value": null,
+                    "label": "Textarea",
+                    "options": []
+                  },
+                  "style": {
+                    "columns": 2,
+                    "width": "100%"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]

@@ -66,8 +66,17 @@ export class CreateformbuilderService {
   }
 
   addItemToArray(parent: FieldConfig, child: FieldConfig): void {
-    if (parent.kind !== 'array') return;
+    console.log('🔵 [Service] addItemToArray called', {
+      parentKind: parent.kind,
+      childType: child.type,
+      childLabel: child.label
+    });
+    if (parent.kind !== 'array') {
+      console.error('❌ [Service] Parent is not an array! Kind:', parent.kind);
+      return;
+    }
     this.updateContainerChildren(parent, child, false);
+    console.log('✅ [Service] Array updated successfully');
   }
 
   // Import/Export
@@ -97,6 +106,13 @@ export class CreateformbuilderService {
     child: FieldConfig, 
     isGroup: boolean
   ): void {
+    console.log('🔵 [Service] updateContainerChildren', {
+      isGroup,
+      parentLabel: (parent as any).label,
+      childType: child.type,
+      currentChildrenCount: Array.isArray(parent.children) ? parent.children.length : Object.keys(parent.children || {}).length
+    });
+    
     const children = isGroup 
       ? (ensureChildren(parent, isGroup) as Record<string, FieldConfig>)
       : (ensureChildren(parent, isGroup) as FieldConfig[]);
@@ -108,6 +124,7 @@ export class CreateformbuilderService {
     } else {
       (children as FieldConfig[]).push(child);
       parent.children = [...(children as FieldConfig[])];
+      console.log('✅ [Service] تم إضافة العنصر للـ Array. العدد الجديد:', (parent.children as FieldConfig[]).length);
     }
     
     this.triggerSchemaUpdate();

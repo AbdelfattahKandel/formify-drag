@@ -103,3 +103,1282 @@ Action items to improve consistency
 
 ## License
 MIT (c) 2025 Formify Team
+
+[
+  users:[
+    {
+  "id": "form_156",
+  "formGroup": "form_group",
+  "containerStyle": {
+    "dir": "ltr",
+    "cssClass": "container grid",
+    "columns": 4,
+    "gap": "1rem",
+    "minHeight": "80vh",
+    "width": "100%",
+    "maxWidth": "1400px",
+    "margin": "0 auto",
+    "padding": "2rem",
+    "border": "1px solid #e2e8f0",
+    "borderRadius": "0.5rem",
+    "backgroundColor": "#ffffff",
+    "boxShadow": "0 1px 3px rgba(0, 0, 0, 0.1)"
+  },
+  "controls": [
+    {
+      "data": {
+        "formControlName": "text",
+        "fieldType": "input-text",
+        "value": null,
+        "label": "Text Input",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "text",
+        "fieldType": "input-text",
+        "value": null,
+        "label": "Text Input",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "password",
+        "fieldType": "password",
+        "value": null,
+        "label": "Password",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "input_number",
+        "fieldType": "input-number",
+        "value": null,
+        "label": "Number",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "input_number",
+        "fieldType": "input-number",
+        "value": null,
+        "label": "Number",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "date",
+        "fieldType": "datepicker",
+        "value": null,
+        "label": "Date Picker",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "select",
+        "fieldType": "select",
+        "value": null,
+        "label": "Select",
+        "options": [
+          {
+            "label": "Option 1",
+            "value": "option1"
+          },
+          {
+            "label": "Option 2",
+            "value": "option2"
+          }
+        ]
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "textarea",
+        "fieldType": "textarea",
+        "value": null,
+        "label": "Textarea",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "checkbox",
+        "fieldType": "checkbox",
+        "value": null,
+        "label": "Checkbox",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "multi_select",
+        "fieldType": "multi-select",
+        "value": null,
+        "label": "Multi Select",
+        "options": [
+          {
+            "label": "Option 1",
+            "value": "option1"
+          },
+          {
+            "label": "Option 2",
+            "value": "option2"
+          }
+        ]
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "attachment",
+        "fieldType": "attachment",
+        "value": null,
+        "label": "Attachment",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formArrayName": "array",
+        "fieldType": "array",
+        "value": null
+      },
+      "style": {
+        "columns": 4,
+        "width": "100%"
+      },
+      "children": []
+    },
+    {
+      "data": {
+        "formControlName": "submit",
+        "fieldType": "submit",
+        "value": null,
+        "label": "Submit",
+        "placeholder": "",
+        "options": [],
+        "validators": []
+      },
+      "style": {
+        "columns": 4,
+        "width": "100%",
+        "backgroundColor": "#22c55e",
+        "padding": "0.5rem 1rem",
+        "borderRadius": "2rem"
+      }
+    }
+  ]
+},
+{
+  "id": "form_156",
+  "formGroup": "form_group",
+  "containerStyle": {
+    "dir": "ltr",
+    "cssClass": "container grid",
+    "columns": 4,
+    "gap": "1rem",
+    "minHeight": "80vh",
+    "width": "100%",
+    "maxWidth": "1400px",
+    "margin": "0 auto",
+    "padding": "2rem",
+    "border": "1px solid #e2e8f0",
+    "borderRadius": "0.5rem",
+    "backgroundColor": "#ffffff",
+    "boxShadow": "0 1px 3px rgba(0, 0, 0, 0.1)"
+  },
+  "controls": [
+    {
+      "data": {
+        "formControlName": "text",
+        "fieldType": "input-text",
+        "value": null,
+        "label": "Text Input",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "text",
+        "fieldType": "input-text",
+        "value": null,
+        "label": "Text Input",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "password",
+        "fieldType": "password",
+        "value": null,
+        "label": "Password",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "input_number",
+        "fieldType": "input-number",
+        "value": null,
+        "label": "Number",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "input_number",
+        "fieldType": "input-number",
+        "value": null,
+        "label": "Number",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "date",
+        "fieldType": "datepicker",
+        "value": null,
+        "label": "Date Picker",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "select",
+        "fieldType": "select",
+        "value": null,
+        "label": "Select",
+        "options": [
+          {
+            "label": "Option 1",
+            "value": "option1"
+          },
+          {
+            "label": "Option 2",
+            "value": "option2"
+          }
+        ]
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "textarea",
+        "fieldType": "textarea",
+        "value": null,
+        "label": "Textarea",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "checkbox",
+        "fieldType": "checkbox",
+        "value": null,
+        "label": "Checkbox",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "multi_select",
+        "fieldType": "multi-select",
+        "value": null,
+        "label": "Multi Select",
+        "options": [
+          {
+            "label": "Option 1",
+            "value": "option1"
+          },
+          {
+            "label": "Option 2",
+            "value": "option2"
+          }
+        ]
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "attachment",
+        "fieldType": "attachment",
+        "value": null,
+        "label": "Attachment",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formArrayName": "array",
+        "fieldType": "array",
+        "value": null
+      },
+      "style": {
+        "columns": 4,
+        "width": "100%"
+      },
+      "children": []
+    },
+    {
+      "data": {
+        "formControlName": "submit",
+        "fieldType": "submit",
+        "value": null,
+        "label": "Submit",
+        "placeholder": "",
+        "options": [],
+        "validators": []
+      },
+      "style": {
+        "columns": 4,
+        "width": "100%",
+        "backgroundColor": "#22c55e",
+        "padding": "0.5rem 1rem",
+        "borderRadius": "2rem"
+      }
+    }
+  ]
+},
+{
+  "id": "form_156",
+  "formGroup": "form_group",
+  "containerStyle": {
+    "dir": "ltr",
+    "cssClass": "container grid",
+    "columns": 4,
+    "gap": "1rem",
+    "minHeight": "80vh",
+    "width": "100%",
+    "maxWidth": "1400px",
+    "margin": "0 auto",
+    "padding": "2rem",
+    "border": "1px solid #e2e8f0",
+    "borderRadius": "0.5rem",
+    "backgroundColor": "#ffffff",
+    "boxShadow": "0 1px 3px rgba(0, 0, 0, 0.1)"
+  },
+  "controls": [
+    {
+      "data": {
+        "formControlName": "text",
+        "fieldType": "input-text",
+        "value": null,
+        "label": "Text Input",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "text",
+        "fieldType": "input-text",
+        "value": null,
+        "label": "Text Input",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "password",
+        "fieldType": "password",
+        "value": null,
+        "label": "Password",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "input_number",
+        "fieldType": "input-number",
+        "value": null,
+        "label": "Number",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "input_number",
+        "fieldType": "input-number",
+        "value": null,
+        "label": "Number",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "date",
+        "fieldType": "datepicker",
+        "value": null,
+        "label": "Date Picker",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "select",
+        "fieldType": "select",
+        "value": null,
+        "label": "Select",
+        "options": [
+          {
+            "label": "Option 1",
+            "value": "option1"
+          },
+          {
+            "label": "Option 2",
+            "value": "option2"
+          }
+        ]
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "textarea",
+        "fieldType": "textarea",
+        "value": null,
+        "label": "Textarea",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "checkbox",
+        "fieldType": "checkbox",
+        "value": null,
+        "label": "Checkbox",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "multi_select",
+        "fieldType": "multi-select",
+        "value": null,
+        "label": "Multi Select",
+        "options": [
+          {
+            "label": "Option 1",
+            "value": "option1"
+          },
+          {
+            "label": "Option 2",
+            "value": "option2"
+          }
+        ]
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "attachment",
+        "fieldType": "attachment",
+        "value": null,
+        "label": "Attachment",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formArrayName": "array",
+        "fieldType": "array",
+        "value": null
+      },
+      "style": {
+        "columns": 4,
+        "width": "100%"
+      },
+      "children": []
+    },
+    {
+      "data": {
+        "formControlName": "submit",
+        "fieldType": "submit",
+        "value": null,
+        "label": "Submit",
+        "placeholder": "",
+        "options": [],
+        "validators": []
+      },
+      "style": {
+        "columns": 4,
+        "width": "100%",
+        "backgroundColor": "#22c55e",
+        "padding": "0.5rem 1rem",
+        "borderRadius": "2rem"
+      }
+    }
+  ]
+}
+  ],
+  ofers: [
+    {
+  "id": "form_156",
+  "formGroup": "form_group",
+  "containerStyle": {
+    "dir": "ltr",
+    "cssClass": "container grid",
+    "columns": 4,
+    "gap": "1rem",
+    "minHeight": "80vh",
+    "width": "100%",
+    "maxWidth": "1400px",
+    "margin": "0 auto",
+    "padding": "2rem",
+    "border": "1px solid #e2e8f0",
+    "borderRadius": "0.5rem",
+    "backgroundColor": "#ffffff",
+    "boxShadow": "0 1px 3px rgba(0, 0, 0, 0.1)"
+  },
+  "controls": [
+    {
+      "data": {
+        "formControlName": "text",
+        "fieldType": "input-text",
+        "value": null,
+        "label": "Text Input",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "text",
+        "fieldType": "input-text",
+        "value": null,
+        "label": "Text Input",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "password",
+        "fieldType": "password",
+        "value": null,
+        "label": "Password",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "input_number",
+        "fieldType": "input-number",
+        "value": null,
+        "label": "Number",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "input_number",
+        "fieldType": "input-number",
+        "value": null,
+        "label": "Number",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "date",
+        "fieldType": "datepicker",
+        "value": null,
+        "label": "Date Picker",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "select",
+        "fieldType": "select",
+        "value": null,
+        "label": "Select",
+        "options": [
+          {
+            "label": "Option 1",
+            "value": "option1"
+          },
+          {
+            "label": "Option 2",
+            "value": "option2"
+          }
+        ]
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "textarea",
+        "fieldType": "textarea",
+        "value": null,
+        "label": "Textarea",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "checkbox",
+        "fieldType": "checkbox",
+        "value": null,
+        "label": "Checkbox",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "multi_select",
+        "fieldType": "multi-select",
+        "value": null,
+        "label": "Multi Select",
+        "options": [
+          {
+            "label": "Option 1",
+            "value": "option1"
+          },
+          {
+            "label": "Option 2",
+            "value": "option2"
+          }
+        ]
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "attachment",
+        "fieldType": "attachment",
+        "value": null,
+        "label": "Attachment",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formArrayName": "array",
+        "fieldType": "array",
+        "value": null
+      },
+      "style": {
+        "columns": 4,
+        "width": "100%"
+      },
+      "children": []
+    },
+    {
+      "data": {
+        "formControlName": "submit",
+        "fieldType": "submit",
+        "value": null,
+        "label": "Submit",
+        "placeholder": "",
+        "options": [],
+        "validators": []
+      },
+      "style": {
+        "columns": 4,
+        "width": "100%",
+        "backgroundColor": "#22c55e",
+        "padding": "0.5rem 1rem",
+        "borderRadius": "2rem"
+      }
+    }
+  ]
+},
+{
+  "id": "form_156",
+  "formGroup": "form_group",
+  "containerStyle": {
+    "dir": "ltr",
+    "cssClass": "container grid",
+    "columns": 4,
+    "gap": "1rem",
+    "minHeight": "80vh",
+    "width": "100%",
+    "maxWidth": "1400px",
+    "margin": "0 auto",
+    "padding": "2rem",
+    "border": "1px solid #e2e8f0",
+    "borderRadius": "0.5rem",
+    "backgroundColor": "#ffffff",
+    "boxShadow": "0 1px 3px rgba(0, 0, 0, 0.1)"
+  },
+  "controls": [
+    {
+      "data": {
+        "formControlName": "text",
+        "fieldType": "input-text",
+        "value": null,
+        "label": "Text Input",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "text",
+        "fieldType": "input-text",
+        "value": null,
+        "label": "Text Input",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "password",
+        "fieldType": "password",
+        "value": null,
+        "label": "Password",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "input_number",
+        "fieldType": "input-number",
+        "value": null,
+        "label": "Number",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "input_number",
+        "fieldType": "input-number",
+        "value": null,
+        "label": "Number",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "date",
+        "fieldType": "datepicker",
+        "value": null,
+        "label": "Date Picker",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "select",
+        "fieldType": "select",
+        "value": null,
+        "label": "Select",
+        "options": [
+          {
+            "label": "Option 1",
+            "value": "option1"
+          },
+          {
+            "label": "Option 2",
+            "value": "option2"
+          }
+        ]
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "textarea",
+        "fieldType": "textarea",
+        "value": null,
+        "label": "Textarea",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "checkbox",
+        "fieldType": "checkbox",
+        "value": null,
+        "label": "Checkbox",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "multi_select",
+        "fieldType": "multi-select",
+        "value": null,
+        "label": "Multi Select",
+        "options": [
+          {
+            "label": "Option 1",
+            "value": "option1"
+          },
+          {
+            "label": "Option 2",
+            "value": "option2"
+          }
+        ]
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "attachment",
+        "fieldType": "attachment",
+        "value": null,
+        "label": "Attachment",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formArrayName": "array",
+        "fieldType": "array",
+        "value": null
+      },
+      "style": {
+        "columns": 4,
+        "width": "100%"
+      },
+      "children": []
+    },
+    {
+      "data": {
+        "formControlName": "submit",
+        "fieldType": "submit",
+        "value": null,
+        "label": "Submit",
+        "placeholder": "",
+        "options": [],
+        "validators": []
+      },
+      "style": {
+        "columns": 4,
+        "width": "100%",
+        "backgroundColor": "#22c55e",
+        "padding": "0.5rem 1rem",
+        "borderRadius": "2rem"
+      }
+    }
+  ]
+},
+{
+  "id": "form_156",
+  "formGroup": "form_group",
+  "containerStyle": {
+    "dir": "ltr",
+    "cssClass": "container grid",
+    "columns": 4,
+    "gap": "1rem",
+    "minHeight": "80vh",
+    "width": "100%",
+    "maxWidth": "1400px",
+    "margin": "0 auto",
+    "padding": "2rem",
+    "border": "1px solid #e2e8f0",
+    "borderRadius": "0.5rem",
+    "backgroundColor": "#ffffff",
+    "boxShadow": "0 1px 3px rgba(0, 0, 0, 0.1)"
+  },
+  "controls": [
+    {
+      "data": {
+        "formControlName": "text",
+        "fieldType": "input-text",
+        "value": null,
+        "label": "Text Input",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "text",
+        "fieldType": "input-text",
+        "value": null,
+        "label": "Text Input",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "password",
+        "fieldType": "password",
+        "value": null,
+        "label": "Password",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "input_number",
+        "fieldType": "input-number",
+        "value": null,
+        "label": "Number",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "input_number",
+        "fieldType": "input-number",
+        "value": null,
+        "label": "Number",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "date",
+        "fieldType": "datepicker",
+        "value": null,
+        "label": "Date Picker",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "select",
+        "fieldType": "select",
+        "value": null,
+        "label": "Select",
+        "options": [
+          {
+            "label": "Option 1",
+            "value": "option1"
+          },
+          {
+            "label": "Option 2",
+            "value": "option2"
+          }
+        ]
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "textarea",
+        "fieldType": "textarea",
+        "value": null,
+        "label": "Textarea",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "checkbox",
+        "fieldType": "checkbox",
+        "value": null,
+        "label": "Checkbox",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "multi_select",
+        "fieldType": "multi-select",
+        "value": null,
+        "label": "Multi Select",
+        "options": [
+          {
+            "label": "Option 1",
+            "value": "option1"
+          },
+          {
+            "label": "Option 2",
+            "value": "option2"
+          }
+        ]
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formControlName": "attachment",
+        "fieldType": "attachment",
+        "value": null,
+        "label": "Attachment",
+        "options": []
+      },
+      "style": {
+        "columns": 2,
+        "width": "100%"
+      }
+    },
+    {
+      "data": {
+        "formArrayName": "array",
+        "fieldType": "array",
+        "value": null
+      },
+      "style": {
+        "columns": 4,
+        "width": "100%"
+      },
+      "children": []
+    },
+    {
+      "data": {
+        "formControlName": "submit",
+        "fieldType": "submit",
+        "value": null,
+        "label": "Submit",
+        "placeholder": "",
+        "options": [],
+        "validators": []
+      },
+      "style": {
+        "columns": 4,
+        "width": "100%",
+        "backgroundColor": "#22c55e",
+        "padding": "0.5rem 1rem",
+        "borderRadius": "2rem"
+      }
+    }
+  ]
+}
+  ]
+]

@@ -5,6 +5,8 @@ import { exportSchema } from '../../../utils/export-schema';
 import { importSchema } from '../../../utils/import-schema';
 import { sanitizeFieldName } from '../../../utils/sanitize-field-name';
 import { ContainerStyle } from '../../models/interfaces/container-style';
+import { PageConfig } from '../../models/interfaces/page-config';
+import { MultiPageExportFormat } from '../../models/interfaces/multi-page-schema';
 
 @Injectable({ providedIn: 'root' })
 export class SchemaSerializerService {
@@ -119,5 +121,100 @@ export class SchemaSerializerService {
       backgroundColor: '#ffffff',
       boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
     };
+  }
+
+  /**
+   * Builds multi-page export schema from pages configuration
+   */
+  buildMultiPageExportSchema(pages: PageConfig[]): MultiPageExportFormat {
+    return pages.map((page) => ({
+      [page.pageName]: {
+        groups: Object.entries(page.groups).reduce(
+          (acc, [groupName, groupConfig]) => {
+            acc[groupName] = groupConfig.forms.map((form) => ({
+              id: form.id,
+              formGroup: form.formGroup || `${groupName}_group`,
+              containerStyle: form.containerStyle || this.getContainerStyle(),
+              controls: form.controls || [],
+            }));
+            return acc;
+          },
+          {} as Record<string, unknown[]>
+        ),
+      },
+    }));
+  }
+
+  /**
+   * Exports multi-page schema as JSON string
+   */
+  exportMultiPage(pages: PageConfig[], pretty: boolean = true): string {
+    const schema = this.buildMultiPageExportSchema(pages);
+    return pretty ? JSON.stringify(schema, null, 2) : JSON.stringify(schema);
+  }
+
+  /**
+   * Imports multi-page schema from JSON string
+   */
+  importMultiPage(json: string): PageConfig[] {
+    try {
+      const parsed = JSON.parse(json);
+
+      if (!Array.isArray(parsed)) {
+        throw new Error('Multi-page schema must be an array');
+      }
+
+      return parsed.map((pageObj) => {
+        const pageName = Object.keys(pageObj)[0];
+        const pageData = pageObj[pageName];
+
+        if (!pageData || !pageData.groups) {
+          throw new Error(`Invalid page structure for "${pageName}"`);
+        }
+
+        const groups = Object.entries(pageData.groups).reduce(
+          (acc, [groupName, forms]) => {
+            if (!Array.isArray(forms)) {
+              throw new Error(`Invalid forms array for group "${groupName}"`);
+            }
+
+            acc[groupName] = {
+              groupName,
+              forms: (forms as any[]).map((form) => ({
+                id: form.id,
+                formGroup: form.formGroup,
+                groupName,
+                pageName,
+                containerStyle: form.containerStyle,
+                controls: form.controls,
+              })),
+            };
+
+            return acc;
+          },
+          {} as Record<string, any>
+        );
+
+        return {
+          pageName,
+          groups,
+        };
+      });
+    } catch (error) {
+      console.error('Failed to import multi-page schema:', error);
+      throw new Error('Invalid multi-page schema format');
+    }
+  }
+
+  /**
+   * Detects if JSON is multi-page format or legacy single-page format
+   */
+  isMultiPageFormat(json: string): boolean {
+    try {
+      const parsed = JSON.parse(json);
+      return Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object';
+    } catch {
+      return false;
+    }
   }
 }

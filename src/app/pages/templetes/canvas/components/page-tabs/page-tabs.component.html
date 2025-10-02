@@ -1,0 +1,38 @@
+<div class="page-tabs-container">
+  <p-tabView 
+    [activeIndex]="getCurrentIndex()" 
+    (activeIndexChange)="onTabChange({ index: $event })"
+    styleClass="w-full">
+    @for (page of pages(); track page.pageName) {
+      <p-tabPanel>
+        <ng-template pTemplate="header">
+          <div class="flex items-center gap-2">
+            <span>{{ page.pageName }}</span>
+            @if (pages().length > 1) {
+              <button
+                pButton
+                type="button"
+                icon="pi pi-times"
+                class="p-button-text p-button-sm p-button-danger"
+                (click)="onRemovePage(page.pageName, $event)"
+                [pTooltip]="'Remove page'"
+                tooltipPosition="top">
+              </button>
+            }
+          </div>
+        </ng-template>
+      </p-tabPanel>
+    }
+  </p-tabView>
+
+  <button
+    pButton
+    type="button"
+    icon="pi pi-plus"
+    label="Add Page"
+    class="p-button-sm p-button-outlined mt-2"
+    (click)="onAddPage()"
+    [pTooltip]="'Add new page'"
+    tooltipPosition="top">
+  </button>
+</div>

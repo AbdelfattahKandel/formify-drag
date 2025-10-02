@@ -1,0 +1,35 @@
+<div class="mb-2">
+  @if (hasGroups()) {
+    <div class="flex gap-2 items-center bg-gray-50 p-2 rounded-md border border-gray-200">
+      <label class="text-xs font-medium whitespace-nowrap text-gray-600">Group:</label>
+      
+      <p-select
+        [options]="groupOptions()"
+        [ngModel]="selectedGroupValue()"
+        (ngModelChange)="onGroupChange($event)"
+        [disabled]="disabled()"
+        placeholder="Select group"
+        styleClass="flex-1 text-sm"
+        [style]="{'font-size': '0.875rem'}"
+        optionLabel="label"
+        optionValue="value">
+      </p-select>
+
+      <button
+        pButton
+        type="button"
+        icon="pi pi-check"
+        class="p-button-success p-button-sm"
+        (click)="onAssignClick()"
+        [disabled]="!selectedGroupValue() || disabled()"
+        [pTooltip]="'Assign Form to Group'"
+        tooltipPosition="top">
+      </button>
+    </div>
+  } @else {
+    <div class="text-xs text-gray-500 p-2 bg-blue-50 rounded-md border border-blue-200">
+      <i class="pi pi-info-circle mr-1"></i>
+      <span>Create a group first</span>
+    </div>
+  }
+</div>

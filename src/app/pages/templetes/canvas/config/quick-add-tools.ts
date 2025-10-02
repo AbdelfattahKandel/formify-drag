@@ -5,8 +5,9 @@ export type QuickAddType = 'input-text' | 'textarea' | 'select' | 'multi-select'
 export interface QuickAddTool {
   type: QuickAddType;
   label: string;
+  icon?: string;
   styleClass?: string;
-  openDialog?: boolean; // when true, component should open a naming dialog instead of addPreset
+  openDialog?: boolean;
 }
 
 // Default quick-add tools for Group containers (no array inside by default here)
@@ -20,7 +21,6 @@ export const QUICK_ADD_GROUP_TOOLS: QuickAddTool[] = [
   { type: 'datepicker', label: 'Datepicker', styleClass: 'p-button-sm p-button-secondary' },
   { type: 'input-number', label: 'Number', styleClass: 'p-button-sm p-button-secondary' },
   { type: 'checkbox', label: 'Checkbox', styleClass: 'p-button-sm p-button-secondary' },
-  { type: 'imagefield', label: 'Images', styleClass: 'p-button-sm p-button-secondary' },
   { type: 'group', label: 'Group', styleClass: 'p-button-sm p-button-help', openDialog: true },
 ];
 

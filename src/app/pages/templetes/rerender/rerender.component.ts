@@ -80,12 +80,14 @@ export class RerenderComponent {
 
   // Allow all drags to enter nested drop lists (match CDK signature)
   alwaysTrue = (_drag?: any, _drop?: any) => true;
-  arrayEditMode!: boolean;
+  arrayEditMode = false;
 
   constructor(private _fbService: CreateformbuilderService) {}
 
   ngOnInit(): void {
     this.initializeField();
+    // Sync arrayEditMode with isEditMode for proper template editing
+    this.arrayEditMode = this.isEditMode;
   }
 
   // Provide a safe accessor for the image FormArray to use in template
@@ -100,6 +102,9 @@ export class RerenderComponent {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['field'] || changes['formGroup']) {
       this.initializeField();
+    }
+    if (changes['isEditMode']) {
+      this.arrayEditMode = this.isEditMode;
     }
   }
 

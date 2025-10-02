@@ -7,16 +7,16 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { InputTextModule } from 'primeng/inputtext';
 
 // Components
-import { PaletteComponent } from '../palette/palette.component';
 import { RerenderComponent } from '../rerender/rerender.component';
 import { JsonViewerComponent } from '../../../shared/components/json-viewer/json-viewer.component';
-import { TogglebuttonComponent } from '../../../shared/components/controls/primeng-controls/togglebutton/togglebutton.component';
-import { ToggleswitchComponent } from '../../../shared/components/controls/primeng-controls/toggleswitch/toggleswitch.component';
+
 import { FieldEditorMossdeComponent } from '../../../shared/components/field-editor-mode/field-editor-mode.component';
+import { UnifiedSidebarComponent } from './components/unified-sidebar/unified-sidebar.component';
 
 // Models
 import { FieldConfig } from '../../../core/models/interfaces/legacy-extras';
 import { FormSchema } from '../../../core/models/interfaces/form-schema';
+
 
 // PrimeNG Modules
 import { MessageService } from 'primeng/api';
@@ -28,22 +28,15 @@ import { PanelModule } from 'primeng/panel';
 import { TabViewModule } from 'primeng/tabview';
 import { TooltipModule } from 'primeng/tooltip';
 
-// Local Components
-import { FormToolbarComponent } from './components/form-toolbar/form-toolbar.component';
-import { FormBuilderComponent as FormBuilderContainer } from './components/form-builder/form-builder.component';
-import { FormPreviewComponent } from './components/form-preview/form-preview.component';
-import { FieldPropertiesComponent } from './components/field-properties/field-properties.component';
+
+import { FormGroupAssignComponent } from './components/form-group-assign/form-group-assign.component';
 import { CreateformbuilderService } from '../../../core/services/formbuilder/createformbuilder.service';
 import { FormGroupFactoryService } from '../../../core/services/formbuilder/form-group-factory.service';
-import { exportSchema } from '../../../utils/export-schema';
+import { PageManagementService } from '../../../core/services/page-management.service';
+import { GroupManagementService } from '../../../core/services/group-management.service';
+import { SchemaSerializerService } from '../../../core/services/formbuilder/schema-serializer.service';
+import { isMultiPageFormat } from '../../../utils/import-multi-page-schema';
 import { PALETTE_TOOLS } from './config/palette-tools';
-
-type TabValue = 'primeng' | 'default';
-interface TabOption {
-  label: string;
-  value: TabValue;
-  icon?: string;
-}
 
 @Component({
   selector: 'app-canvas',
@@ -65,9 +58,10 @@ interface TabOption {
     SelectButtonModule,
     FieldEditorMossdeComponent,
     // Local Components
-    PaletteComponent,
     RerenderComponent,
-    InputTextModule
+    InputTextModule,
+    UnifiedSidebarComponent,
+    FormGroupAssignComponent
   ],
   templateUrl: './canvas.component.html',
   styleUrls: ['./canvas.component.css'],
@@ -79,19 +73,16 @@ interface TabOption {
 })
 export class CanvasComponent implements OnInit, OnDestroy {
   private _fb = inject(FormBuilder);
-  darkIcon: string = 'pi pi-moon';
-  readonly tabs: TabOption[] = [
-    { label: 'PrimeNG', value: 'primeng', icon: 'pi pi-prime' },
-    { label: 'Default', value: 'default', icon: 'pi pi-list' },
-  ];
 
-  selectionCtrl = this._fb.control<TabValue>('primeng');
   // Services
   private readonly fb = inject(FormBuilder);
   private readonly messageService = inject(MessageService);
   private readonly dialogService = inject(DialogService);
   private readonly formBuilderService = inject(CreateformbuilderService);
   private readonly fgFactory = inject(FormGroupFactoryService);
+  private readonly pageManagementService = inject(PageManagementService);
+  private readonly groupManagementService = inject(GroupManagementService);
+  private readonly schemaSerializer = inject(SchemaSerializerService);
   private readonly subs = new Subscription();
   private readonly injector = inject(Injector);
 
@@ -103,6 +94,12 @@ export class CanvasComponent implements OnInit, OnDestroy {
   isPreviewMode = signal(false);
   selectedField: FieldConfig | null = null;
   title: string = '';
+  
+  // Multi-page state
+  currentPage = this.pageManagementService.currentPageName;
+  pages = this.pageManagementService.pages;
+  selectedGroup = signal<string>('');
+  currentGroupNames = signal<string[]>([]);
   
   // Toolbox items (externalized)
   paletteTools: FieldConfig[] = PALETTE_TOOLS;
@@ -121,6 +118,9 @@ export class CanvasComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Initialize form group
     this.initializeForm();
+    
+    // Initialize group names for current page
+    this.updateCurrentGroupNames();
     
     // Subscribe to form value changes
     this.subs.add(
@@ -155,54 +155,112 @@ export class CanvasComponent implements OnInit, OnDestroy {
     this.formGroup = this.formBuilderService.buildFormGroup(schema);
   }
   
-  private getFieldValidators(field: FieldConfig) {
-    const validators = [] as any[];
-    
-    if (field.required) {
-      validators.push(Validators.required);
-    }
-    
-    if ((field as any).min !== undefined) {
-      validators.push(Validators.min((field as any).min));
-    }
-    
-    if ((field as any).max !== undefined) {
-      validators.push(Validators.max((field as any).max));
-    }
-    
-    if ((field as any).minLength !== undefined) {
-      validators.push(Validators.minLength((field as any).minLength));
-    }
-    
-    if ((field as any).maxLength !== undefined) {
-      validators.push(Validators.maxLength((field as any).maxLength));
-    }
-    
-    if ((field as any).pattern) {
-      validators.push(Validators.pattern((field as any).pattern));
-    }
-    
-    if ((field as any).type === 'email') {
-      validators.push(Validators.email);
-    }
-    
-    return validators.length > 0 ? validators : null;
+  
+
+  // ===== Multi-Page & Group Management =====
+  
+  private updateCurrentGroupNames(): void {
+    const pageName = this.currentPage();
+    const groupNames = this.groupManagementService.getGroupNames(pageName);
+    this.currentGroupNames.set(groupNames);
   }
+
+  onPageAdd(): void {
+    const pageName = prompt('Enter new page name:');
+    if (!pageName || !pageName.trim()) {
+      this.messageService.add({ severity: 'warn', summary: 'Invalid Name', detail: 'Page name cannot be empty.' });
+      return;
+    }
+
+    const success = this.pageManagementService.addPage(pageName.trim());
+    if (success) {
+      this.messageService.add({ severity: 'success', summary: 'Success', detail: `Page "${pageName}" added.` });
+    } else {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to add page.' });
+    }
+  }
+
+  onPageSwitch(pageName: string): void {
+    this.pageManagementService.switchPage(pageName);
+    this.updateCurrentGroupNames();
+    this.droppedTools = [];
+  }
+
+  onPageRemove(pageName: string): void {
+    const success = this.pageManagementService.removePage(pageName);
+    if (success) {
+      this.messageService.add({ severity: 'success', summary: 'Success', detail: `Page "${pageName}" removed.` });
+      this.updateCurrentGroupNames();
+    } else {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Cannot remove the last page.' });
+    }
+  }
+
+  onGroupAdd(): void {
+    const groupName = prompt('Enter new group name:');
+    if (!groupName || !groupName.trim()) {
+      this.messageService.add({ severity: 'warn', summary: 'Invalid Name', detail: 'Group name cannot be empty.' });
+      return;
+    }
+
+    const pageName = this.currentPage();
+    const success = this.groupManagementService.addGroup(pageName, groupName.trim());
+    if (success) {
+      this.updateCurrentGroupNames();
+      this.selectedGroup.set(groupName.trim());
+      this.messageService.add({ severity: 'success', summary: 'Success', detail: `Group "${groupName}" added.` });
+    } else {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to add group.' });
+    }
+  }
+
+  onGroupSelect(groupName: string): void {
+    this.selectedGroup.set(groupName);
+  }
+
+  onGroupRemove(groupName: string): void {
+    const pageName = this.currentPage();
+    const success = this.groupManagementService.removeGroup(pageName, groupName);
+    if (success) {
+      this.updateCurrentGroupNames();
+      if (this.selectedGroup() === groupName) {
+        this.selectedGroup.set('');
+      }
+      this.messageService.add({ severity: 'success', summary: 'Success', detail: `Group "${groupName}" removed.` });
+    } else {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to remove group.' });
+    }
+  }
+
+  onAssignFormToGroup(): void {
+    const pageName = this.currentPage();
+    const groupName = this.selectedGroup();
+    
+    if (!groupName) {
+      this.messageService.add({ severity: 'warn', summary: 'No Group', detail: 'Please select a group first.' });
+      return;
+    }
+
+    const formSchema: FormSchema = this.formBuilderService.buildExportSchema(this.droppedTools, this.title);
+    formSchema.pageName = pageName;
+    formSchema.groupName = groupName;
+
+    const success = this.groupManagementService.assignFormToGroup(pageName, groupName, formSchema);
+    if (success) {
+      this.messageService.add({ severity: 'success', summary: 'Success', detail: `Form assigned to group "${groupName}".` });
+      this.droppedTools = [];
+    } else {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to assign form to group.' });
+    }
+  }
+
   isEditMode: boolean = true;
   droppedTools: FieldConfig[] = [];
 
 
-  private updateFormWithDroppedTools() {
-    this.syncFormWithDroppedTools();
-  }
   showFieldEditor = false;
   showJsonDialog = false;
   generatedJson = '';
-  // Add-control dialog state
-  showAddControlDialog = false;
-  targetGroup: FieldConfig | null = null;
-  newControl: Partial<FieldConfig> = { type: 'text' as any, label: '', formControl: '' } as any;
-  controlTypes: string[] = ['text','password','email','number','date','time','datetime-local','checkbox','radio','select','multi-select','textarea','file','color'];
 
   drop(event: CdkDragDrop<any[]>) {
     if (event.previousContainer === event.container) {
@@ -214,82 +272,24 @@ export class CanvasComponent implements OnInit, OnDestroy {
       this.droppedTools.splice(event.currentIndex, 0, copiedItem);
       this.droppedTools = [...this.droppedTools];
       // Ensure FormGroup has controls for new fields
-      this.updateFormWithDroppedTools();
+      this.syncFormWithDroppedTools();
       
       this.onFieldSelected(copiedItem);
       
       // this.openFieldEditor(copiedItem);
     }
   }
-  openAddControlDialog(group: FieldConfig) {
-    this.targetGroup = group;
-    this.newControl = { type: 'text', label: '', formControl: '' } as any;
-    this.showAddControlDialog = true;
-  }
-
-  addControlToTargetGroup() {
-    if (!this.targetGroup || this.targetGroup.kind !== 'group') {
-      this.messageService.add({ severity: 'error', summary: 'No group selected', detail: 'Please select a valid group.' });
-      return;
-    }
-    const ctrlName = (this.newControl.formControl || '').toString().trim();
-    if (!ctrlName) {
-      this.messageService.add({ severity: 'warn', summary: 'Control name required', detail: 'Please enter a control name.' });
-      return;
-    }
-    const control: FieldConfig = {
-      kind: 'control',
-      formControl: ctrlName,
-      type: (this.newControl.type as any) || 'text',
-      label: (this.newControl.label as any) || ctrlName,
-      fieldStyle: { columns: 2, width: '100%' } as any,
-      value: null
-    } as any;
-    this.formBuilderService.addChildToGroup(this.targetGroup, control);
-    this.showAddControlDialog = false;
-    this.targetGroup = null;
-  }
-
-  onDialogDrop(event: CdkDragDrop<any>) {
-    if (!this.targetGroup || this.targetGroup.kind !== 'group') return;
-    const tool = event.item?.data as FieldConfig;
-    if (!tool) return;
-    const copied = this.formBuilderService.createCopiedField(tool);
-    this.formBuilderService.addChildToGroup(this.targetGroup, copied);
-  }
-
   onFieldSelected(field: FieldConfig) {
     this.selectedField = field;
   }
 
-  addGroup() {
-    const name = prompt('Enter group name');
-    if (!name || !name.trim()) {
-      this.messageService.add({ severity: 'warn', summary: 'Name required', detail: 'Please provide a valid group name.' });
-      return;
-    }
-    const keyBase = name.trim().replace(/\s+/g, '_').toLowerCase();
-    const newGroup: FieldConfig = {
-      // id: uuidv4(),
-      kind: 'group',
-      key: keyBase,
-      label: name.trim(),
-      fieldStyle: { columns: 4 } as any,
-      children: {}
-    } as any;
-    this.droppedTools = [...this.droppedTools, newGroup];
-
-    // Immediately open add-control dialog targeting this group
-    this.openAddControlDialog(newGroup);
-  }
-
   generateJson() {
     try {
-      const formSchema: FormSchema = this.formBuilderService.buildExportSchema(this.droppedTools, this.title);
-      this.generatedJson = exportSchema(formSchema);
+      const pages = this.pageManagementService.getPages();
+      this.generatedJson = this.schemaSerializer.exportMultiPage(pages);
       
       const ref = this.dialogService.open(JsonViewerComponent, {
-        header: 'Generated Form Schema',
+        header: 'Generated Multi-Page Form Schema',
         width: '70%',
         contentStyle: { 'max-height': '500px', 'overflow': 'auto' },
         baseZIndex: 10000,
@@ -318,36 +318,24 @@ export class CanvasComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Download the current form schema as a JSON file. This syncs current FormGroup
-  // control values into droppedTools so the output reflects live values.
+  // Download the multi-page form schema as a JSON file
   downloadJson() {
     try {
-      // Sync values from reactive form into droppedTools (controls only)
-      this.droppedTools = this.droppedTools.map(f => {
-        if (typeof f.formControl === 'string') {
-          const ctrl = this.formGroup.get(f.formControl) as FormControl | null;
-          if (ctrl) {
-            return { ...(f as any), value: ctrl.value } as FieldConfig;
-          }
-        }
-        return f;
-      });
-
-      const formSchema: FormSchema = this.formBuilderService.buildExportSchema(this.droppedTools, this.title);
-      const json = exportSchema(formSchema);
+      const pages = this.pageManagementService.getPages();
+      const json = this.schemaSerializer.exportMultiPage(pages);
 
       const blob = new Blob([json], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      const name = (this.title && this.title.trim()) ? this.title.trim() : 'form';
+      const name = 'multi-page-form';
       a.download = `${name}.json`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
 
-      this.messageService.add({ severity: 'success', summary: 'Download', detail: 'JSON downloaded successfully.' });
+      this.messageService.add({ severity: 'success', summary: 'Download', detail: 'Multi-page JSON downloaded successfully.' });
     } catch (error) {
       console.error('Error downloading JSON:', error);
       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to download JSON.' });
@@ -370,15 +358,27 @@ export class CanvasComponent implements OnInit, OnDestroy {
     reader.onload = () => {
       try {
         const text = String(reader.result || '');
-        const parsed = JSON.parse(text) as any;
+        
+        // Check if it's multi-page format
+        if (isMultiPageFormat(text)) {
+          const pages = this.schemaSerializer.importMultiPage(text);
+          this.pageManagementService.setPages(pages);
+          this.updateCurrentGroupNames();
+          this.messageService.add({ 
+            severity: 'success', 
+            summary: 'Import', 
+            detail: `Multi-page form imported successfully. ${pages.length} page(s) loaded.` 
+          });
+          return;
+        }
 
-        // Prefer the exported "controls" shape
+        // Legacy single-page format fallback
+        const parsed = JSON.parse(text) as any;
         const controls = Array.isArray(parsed?.controls) ? parsed.controls : [];
         const nextFields: FieldConfig[] = controls.map((c: any) => {
           const data = c?.data || {};
           const style = c?.style || {};
           return {
-            // id:  uuidv4(),
             kind: 'control' as any,
             formControl: data.formControlName,
             key: data.formControlName,
@@ -396,7 +396,6 @@ export class CanvasComponent implements OnInit, OnDestroy {
           } as any as FieldConfig;
         });
 
-        // Fallback: if no controls, try legacy fields
         const legacyFields: FieldConfig[] = Array.isArray(parsed?.fields) ? (parsed.fields as FieldConfig[]) : [];
 
         if (nextFields.length > 0) {
@@ -408,14 +407,12 @@ export class CanvasComponent implements OnInit, OnDestroy {
           return;
         }
 
-        // Set title if provided
         if (parsed?.formGroup && typeof parsed.formGroup === 'string') {
           this.title = parsed.formGroup;
         }
 
-        // Rebuild the reactive form
         this.syncFormWithDroppedTools();
-        this.messageService.add({ severity: 'success', summary: 'Import', detail: 'Form imported successfully.' });
+        this.messageService.add({ severity: 'success', summary: 'Import', detail: 'Legacy form imported successfully.' });
       } catch (error) {
         console.error('Error importing JSON:', error);
         this.messageService.add({ severity: 'error', summary: 'Import Error', detail: 'Invalid JSON format.' });
@@ -478,41 +475,6 @@ export class CanvasComponent implements OnInit, OnDestroy {
     }
   }
 
-  addField(field: any): void {
-    // Generate a unique ID for the field
-    const fieldWithId = {
-      ...field,
-      // id: uuidv4(),
-      formControl: field.formControl || `field${this.droppedTools.length + 1}`,
-      // Ensure disabled is a boolean
-      disabled: !!field.disabled
-    } as any;
-    
-    // Add the field to the form group
-    if (fieldWithId.type !== 'file' && fieldWithId.type !== 'image' && !this.formGroup.get(fieldWithId.formControl)) {
-      const control = new FormControl({
-        value: this.getInitialControlValue(fieldWithId),
-        disabled: fieldWithId.disabled
-      });
-      this.formGroup.addControl(fieldWithId.formControl, control);
-    }
-    
-    this.droppedTools = [...this.droppedTools, fieldWithId as FieldConfig];
-    this.selectedField = fieldWithId as FieldConfig;
-  }
-
-  onItemDragged(tool: any) {
-    const toolExists = this.paletteTools.some(t => (t as any).type === tool.type);
-    
-    if (!toolExists) {
-      this.paletteTools = [...this.paletteTools, { ...tool } as FieldConfig];
-    }
-  }
-
-  removeTool(index: number) {
-    this.droppedTools.splice(index, 1);
-    this.droppedTools = [...this.droppedTools];
-  }
 
   // Sync the built FormGroup with currently dropped tools using core factory
   private syncFormWithDroppedTools() {
@@ -520,18 +482,6 @@ export class CanvasComponent implements OnInit, OnDestroy {
     this.formGroup = this.formBuilderService.buildFormGroup(schema);
   }
 
-  private getInitialControlValue(field: any) {
-    switch (field.type) {
-      case 'checkbox':
-        return !!field.checked;
-      case 'number':
-        return field.value ?? null;
-      case 'date':
-        return field.value ?? null;
-      default:
-        return field.value ?? '';
-    }
-  }
 
   // ===== Array utilities (no nested arrays allowed) =====
   isArrayField(field: FieldConfig): boolean {

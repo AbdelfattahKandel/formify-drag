@@ -34,7 +34,6 @@ export class NodelayoutComponent {
   private _fb = inject(FormBuilder);
   private _toggleThemeService = inject(ToggleThemeService);
   private _formBuilderService = inject(CreateformbuilderService);
-  darkIcon: string = 'pi pi-moon';
   readonly tabs: TabOption[] = [
     { label: 'PrimeNG', value: 'primeng', icon: 'pi pi-prime' },
     { label: 'Default', value: 'default', icon: 'pi pi-list' },
@@ -48,7 +47,6 @@ export class NodelayoutComponent {
   toggleTheme() {
     this._toggleThemeService.toggleDarkMode();
     const isDark = document.documentElement.classList.contains('my-app-dark');
-    this.darkIcon = isDark ? 'pi pi-sun' : 'pi pi-moon';
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
   }
 
@@ -56,7 +54,6 @@ export class NodelayoutComponent {
     const theme = localStorage.getItem('theme');
     if (theme === 'dark') {
       this._toggleThemeService.toggleDarkMode();
-      this.darkIcon = 'pi pi-sun';
     }
   }
 

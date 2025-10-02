@@ -1,0 +1,49 @@
+<div class="group-sidebar">
+  <p-panel header="Groups" styleClass="h-full">
+    <ng-template pTemplate="header">
+      <div class="flex items-center justify-between w-full">
+        <span class="font-semibold">Groups</span>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-plus"
+          class="p-button-sm p-button-rounded p-button-text"
+          (click)="onAddGroup()"
+          [pTooltip]="'Add new group'"
+          tooltipPosition="left">
+        </button>
+      </div>
+    </ng-template>
+
+    <div class="groups-list">
+      @if (groupNames().length === 0) {
+        <div class="empty-state">
+          <i class="pi pi-folder-open text-4xl text-gray-400 mb-2"></i>
+          <p class="text-gray-500 text-sm">No groups yet</p>
+          <p class="text-gray-400 text-xs">Click + to add a group</p>
+        </div>
+      } @else {
+        @for (groupName of groupNames(); track groupName) {
+          <div 
+            class="group-item"
+            [class.selected]="isSelected(groupName)"
+            (click)="onSelectGroup(groupName)">
+            <div class="flex items-center gap-2 flex-1">
+              <i class="pi pi-folder text-lg"></i>
+              <span class="font-medium">{{ groupName }}</span>
+            </div>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-trash"
+              class="p-button-text p-button-sm p-button-danger"
+              (click)="onRemoveGroup(groupName, $event)"
+              [pTooltip]="'Remove group'"
+              tooltipPosition="left">
+            </button>
+          </div>
+        }
+      }
+    </div>
+  </p-panel>
+</div>

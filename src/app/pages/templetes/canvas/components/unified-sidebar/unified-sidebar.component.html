@@ -1,0 +1,134 @@
+<div class="unified-sidebar h-full">
+  <p-accordion [multiple]="true" [activeIndex]="[0, 1, 2]">
+    
+    <!-- 📄 Pages Section -->
+    <p-accordionTab>
+      <ng-template pTemplate="header">
+        <div class="flex items-center gap-2 w-full">
+          <i class="pi pi-file text-blue-600"></i>
+          <span class="font-semibold text-sm">Pages</span>
+          <p-badge [value]="pagesCount().toString()" severity="info" class="ml-auto"></p-badge>
+        </div>
+      </ng-template>
+      
+      <div class="space-y-1">
+        @for (page of pages(); track page.pageName) {
+          <div 
+            class="flex items-center justify-between p-2 rounded hover:bg-gray-100 cursor-pointer transition-colors"
+            [class.bg-blue-50]="isPageSelected(page.pageName)"
+            [class.border-l-4]="isPageSelected(page.pageName)"
+            [class.border-blue-500]="isPageSelected(page.pageName)"
+            (click)="onSelectPage(page.pageName)">
+            <span class="text-sm" [class.font-semibold]="isPageSelected(page.pageName)">
+              {{ page.pageName }}
+            </span>
+            @if (pages().length > 1) {
+              <button 
+                pButton 
+                icon="pi pi-times" 
+                class="p-button-text p-button-sm p-button-danger p-button-rounded"
+                (click)="onRemovePage(page.pageName, $event)"
+                pTooltip="Remove Page"
+                tooltipPosition="left">
+              </button>
+            }
+          </div>
+        }
+        
+        <button 
+          pButton 
+          icon="pi pi-plus" 
+          label="Add Page" 
+          class="p-button-sm p-button-outlined w-full mt-2"
+          (click)="onAddPage()">
+        </button>
+      </div>
+    </p-accordionTab>
+
+    <!-- 📁 Groups Section -->
+    <p-accordionTab>
+      <ng-template pTemplate="header">
+        <div class="flex items-center gap-2 w-full">
+          <i class="pi pi-folder text-orange-600"></i>
+          <span class="font-semibold text-sm">Groups</span>
+          <p-badge [value]="groupsCount().toString()" severity="warn" class="ml-auto"></p-badge>
+        </div>
+      </ng-template>
+      
+      <div class="space-y-1">
+        @if (groupNames().length > 0) {
+          @for (groupName of groupNames(); track groupName) {
+            <div 
+              class="flex items-center justify-between p-2 rounded hover:bg-gray-100 cursor-pointer transition-colors"
+              [class.bg-orange-50]="isGroupSelected(groupName)"
+              [class.border-l-4]="isGroupSelected(groupName)"
+              [class.border-orange-500]="isGroupSelected(groupName)"
+              (click)="onSelectGroup(groupName)">
+              <span class="text-sm" [class.font-semibold]="isGroupSelected(groupName)">
+                {{ groupName }}
+              </span>
+              <button 
+                pButton 
+                icon="pi pi-times" 
+                class="p-button-text p-button-sm p-button-danger p-button-rounded"
+                (click)="onRemoveGroup(groupName, $event)"
+                pTooltip="Remove Group"
+                tooltipPosition="left">
+              </button>
+            </div>
+          }
+        } @else {
+          <div class="text-xs text-gray-500 p-2 bg-blue-50 rounded border border-blue-200">
+            <i class="pi pi-info-circle mr-1"></i>
+            <span>No groups yet</span>
+          </div>
+        }
+        
+        <button 
+          pButton 
+          icon="pi pi-plus" 
+          label="Add Group" 
+          class="p-button-sm p-button-outlined w-full mt-2"
+          (click)="onAddGroup()">
+        </button>
+      </div>
+    </p-accordionTab>
+
+    <!-- 🧩 Controls Section -->
+    <p-accordionTab>
+      <ng-template pTemplate="header">
+        <div class="flex items-center gap-2 w-full">
+          <i class="pi pi-th-large text-green-600"></i>
+          <span class="font-semibold text-sm">Controls</span>
+          <p-badge [value]="controlsCount().toString()" severity="success" class="ml-auto"></p-badge>
+        </div>
+      </ng-template>
+      
+      <div>
+        <!-- Draggable Controls -->
+        <div 
+          cdkDropList 
+          id="palette" 
+          [cdkDropListData]="paletteTools()" 
+          [cdkDropListConnectedTo]="['canvas']"
+          class="space-y-2">
+          @for (tool of paletteTools(); track trackByFn($index, tool)) {
+            <div 
+              cdkDrag
+              [cdkDragData]="tool"
+              (cdkDragStarted)="onDragStarted(tool)"
+              class="p-3 border rounded hover:shadow-md transition-shadow cursor-grab">
+              <div class="flex items-center gap-2">
+                <i class="pi pi-plus text-blue-400 text-md"></i>
+                <span class="text-sm">
+                  {{ tool.label || tool.type }}
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </p-accordionTab>
+    
+  </p-accordion>
+</div>
