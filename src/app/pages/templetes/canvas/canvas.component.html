@@ -11,7 +11,7 @@
         (pageAdd)="onPageAdd()"
         (pageRemove)="onPageRemove($event)"
         (groupSelect)="onGroupSelect($event)"
-        (groupAdd)="onGroupAdd()"
+        (groupAdd)="onGroupAdd($event)"
         (groupRemove)="onGroupRemove($event)">
       </app-unified-sidebar>
     </div>
@@ -74,7 +74,7 @@
           </div>
           }
   
-          @for (tool of droppedTools; track tool.id) {
+          @for (tool of droppedTools; track tool.formControl || tool.id || $index) {
           <div cdkDrag [cdkDragData]="tool" (click)="onFieldSelected(tool)" class="field-container"
                [style.grid-column]="'span ' + (tool.fieldStyle?.columns || 1)"
                [style.width]="tool.fieldStyle?.width || '100%'">
@@ -105,3 +105,12 @@
       (cancel)="showFieldEditor = false"
     ></app-field-editor-mode>
   }
+
+  <!-- Export Options Dialog - COMMENTED FOR FUTURE USE -->
+  <!--
+  <app-export-options-dialog
+    [(visible)]="showExportOptionsDialog"
+    [mode]="exportMode()"
+    (export)="onExportWithOptions($event)"
+  ></app-export-options-dialog>
+  -->

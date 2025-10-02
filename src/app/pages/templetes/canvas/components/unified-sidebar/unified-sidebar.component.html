@@ -1,7 +1,8 @@
 <div class="unified-sidebar h-full">
-  <p-accordion [multiple]="true" [activeIndex]="[0, 1, 2]">
+  <p-accordion [multiple]="true" [activeIndex]="[0, 1]">
     
-    <!-- 📄 Pages Section -->
+    <!-- 📄 Pages Section - HIDDEN (not needed in new structure) -->
+    <!--
     <p-accordionTab>
       <ng-template pTemplate="header">
         <div class="flex items-center gap-2 w-full">
@@ -44,13 +45,14 @@
         </button>
       </div>
     </p-accordionTab>
+    -->
 
-    <!-- 📁 Groups Section -->
+    <!-- 📁 Forms Section (formerly Groups) -->
     <p-accordionTab>
       <ng-template pTemplate="header">
         <div class="flex items-center gap-2 w-full">
           <i class="pi pi-folder text-orange-600"></i>
-          <span class="font-semibold text-sm">Groups</span>
+          <span class="font-semibold text-sm">Forms</span>
           <p-badge [value]="groupsCount().toString()" severity="warn" class="ml-auto"></p-badge>
         </div>
       </ng-template>
@@ -80,14 +82,14 @@
         } @else {
           <div class="text-xs text-gray-500 p-2 bg-blue-50 rounded border border-blue-200">
             <i class="pi pi-info-circle mr-1"></i>
-            <span>No groups yet</span>
+            <span>No Forms yet</span>
           </div>
         }
         
         <button 
           pButton 
           icon="pi pi-plus" 
-          label="Add Group" 
+          label="Add Forms" 
           class="p-button-sm p-button-outlined w-full mt-2"
           (click)="onAddGroup()">
         </button>
@@ -131,4 +133,10 @@
     </p-accordionTab>
     
   </p-accordion>
+
+  <!-- Add Form Dialog -->
+  <app-add-form-dialog
+    [(visible)]="showAddFormDialog"
+    (add)="onFormAdded($event)"
+  ></app-add-form-dialog>
 </div>

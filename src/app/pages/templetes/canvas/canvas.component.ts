@@ -12,6 +12,7 @@ import { JsonViewerComponent } from '../../../shared/components/json-viewer/json
 
 import { FieldEditorMossdeComponent } from '../../../shared/components/field-editor-mode/field-editor-mode.component';
 import { UnifiedSidebarComponent } from './components/unified-sidebar/unified-sidebar.component';
+import { ExportOptionsDialogComponent, ExportOptions } from '../../../shared/components/export-options-dialog/export-options-dialog.component';
 
 // Models
 import { FieldConfig } from '../../../core/models/interfaces/legacy-extras';
@@ -196,10 +197,9 @@ export class CanvasComponent implements OnInit, OnDestroy {
     }
   }
 
-  onGroupAdd(): void {
-    const groupName = prompt('Enter new group name:');
+  onGroupAdd(groupName: string): void {
     if (!groupName || !groupName.trim()) {
-      this.messageService.add({ severity: 'warn', summary: 'Invalid Name', detail: 'Group name cannot be empty.' });
+      this.messageService.add({ severity: 'warn', summary: 'Invalid Name', detail: 'Form name cannot be empty.' });
       return;
     }
 
@@ -208,14 +208,23 @@ export class CanvasComponent implements OnInit, OnDestroy {
     if (success) {
       this.updateCurrentGroupNames();
       this.selectedGroup.set(groupName.trim());
-      this.messageService.add({ severity: 'success', summary: 'Success', detail: `Group "${groupName}" added.` });
+      this.messageService.add({ severity: 'success', summary: 'Success', detail: `Form "${groupName}" added.` });
     } else {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to add group.' });
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to add form.' });
     }
   }
 
   onGroupSelect(groupName: string): void {
+    // Save current form controls before switching
+    if (this.selectedGroup()) {
+      this.saveCurrentFormControls();
+    }
+    
     this.selectedGroup.set(groupName);
+    
+    // Load controls for the newly selected form
+    this.loadCurrentFormControls();
+    this.syncFormWithDroppedTools();
   }
 
   onGroupRemove(groupName: string): void {
@@ -247,8 +256,10 @@ export class CanvasComponent implements OnInit, OnDestroy {
 
     const success = this.groupManagementService.assignFormToGroup(pageName, groupName, formSchema);
     if (success) {
+      // Save controls to map instead of clearing
+      this.saveCurrentFormControls();
+      
       this.messageService.add({ severity: 'success', summary: 'Success', detail: `Form assigned to group "${groupName}".` });
-      this.droppedTools = [];
     } else {
       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to assign form to group.' });
     }
@@ -256,6 +267,26 @@ export class CanvasComponent implements OnInit, OnDestroy {
 
   isEditMode: boolean = true;
   droppedTools: FieldConfig[] = [];
+  
+  // Store controls for each form: { pageName_groupName: FieldConfig[] }
+  private formControlsMap = new Map<string, FieldConfig[]>();
+  
+  // Get unique key for current form
+  private getCurrentFormKey(): string {
+    return `${this.currentPage()}_${this.selectedGroup()}`;
+  }
+  
+  // Load controls for current form
+  private loadCurrentFormControls(): void {
+    const key = this.getCurrentFormKey();
+    this.droppedTools = this.formControlsMap.get(key) || [];
+  }
+  
+  // Save controls for current form
+  private saveCurrentFormControls(): void {
+    const key = this.getCurrentFormKey();
+    this.formControlsMap.set(key, [...this.droppedTools]);
+  }
 
 
   showFieldEditor = false;
@@ -271,6 +302,10 @@ export class CanvasComponent implements OnInit, OnDestroy {
       
       this.droppedTools.splice(event.currentIndex, 0, copiedItem);
       this.droppedTools = [...this.droppedTools];
+      
+      // Save to map after adding
+      this.saveCurrentFormControls();
+      
       // Ensure FormGroup has controls for new fields
       this.syncFormWithDroppedTools();
       
@@ -358,16 +393,46 @@ export class CanvasComponent implements OnInit, OnDestroy {
     reader.onload = () => {
       try {
         const text = String(reader.result || '');
+        // console.log( `text: ${text}`)
         
         // Check if it's multi-page format
         if (isMultiPageFormat(text)) {
           const pages = this.schemaSerializer.importMultiPage(text);
+          console.log('📥 [Import] Parsed pages:', pages);
+          
           this.pageManagementService.setPages(pages);
           this.updateCurrentGroupNames();
+          
+          // Load controls for each form into the map
+          this.formControlsMap.clear();
+          pages.forEach(page => {
+            Object.entries(page.groups).forEach(([groupName, groupConfig]) => {
+              groupConfig.forms.forEach(form => {
+                const key = `${page.pageName}_${groupName}`;
+                const controls = (form.controls || []) as unknown as FieldConfig[];
+                console.log(`📥 [Import] Loading controls for ${key}:`, controls);
+                this.formControlsMap.set(key, controls);
+              });
+            });
+          });
+          
+          // Select first group if available
+          const firstGroupName = this.currentGroupNames()[0];
+          if (firstGroupName) {
+            this.selectedGroup.set(firstGroupName);
+            console.log('📥 [Import] Selected first group:', firstGroupName);
+          }
+          
+          // Load controls for current form
+          this.loadCurrentFormControls();
+          this.syncFormWithDroppedTools();
+          
+          console.log('📥 [Import] Loaded controls:', this.droppedTools);
+          
           this.messageService.add({ 
             severity: 'success', 
             summary: 'Import', 
-            detail: `Multi-page form imported successfully. ${pages.length} page(s) loaded.` 
+            detail: `Form imported successfully with ${this.currentGroupNames().length} form(s).` 
           });
           return;
         }
@@ -434,6 +499,10 @@ export class CanvasComponent implements OnInit, OnDestroy {
     if (index !== -1) {
       const prev = this.droppedTools[index] as any;
       const incoming: any = { ...updatedField };
+      
+      // Save after edit
+      this.saveCurrentFormControls();
+      
       // Preserve children for containers if editor didn't send them
       if ((prev.kind === 'array' || prev.kind === 'group') && incoming.children == null) {
         incoming.children = prev.children;
@@ -472,6 +541,9 @@ export class CanvasComponent implements OnInit, OnDestroy {
       this.droppedTools.splice(index, 1);
       this.droppedTools = [...this.droppedTools];
       this.selectedField = null;
+      
+      // Save after delete
+      this.saveCurrentFormControls();
     }
   }
 

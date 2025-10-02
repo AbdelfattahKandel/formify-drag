@@ -1,0 +1,117 @@
+<p-dialog
+  header="Export Options"
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '450px' }"
+>
+  <div class="export-options p-fluid">
+    <!-- Style Format - COMMENTED FOR FUTURE USE -->
+    <!-- 
+    <div class="field mb-4">
+      <label class="block text-900 font-semibold mb-3">Style Format</label>
+      <div class="flex flex-column gap-3">
+        <div class="flex align-items-center">
+          <p-radioButton
+            name="styleFormat"
+            value="tailwind"
+            [(ngModel)]="styleFormat"
+            inputId="tailwind"
+          ></p-radioButton>
+          <label for="tailwind" class="ml-2 cursor-pointer">
+            <span class="font-medium">Tailwind CSS</span>
+            <small class="block text-500">Use Tailwind utility classes (recommended)</small>
+          </label>
+        </div>
+        <div class="flex align-items-center">
+          <p-radioButton
+            name="styleFormat"
+            value="css"
+            [(ngModel)]="styleFormat"
+            inputId="css"
+          ></p-radioButton>
+          <label for="css" class="ml-2 cursor-pointer">
+            <span class="font-medium">Inline CSS</span>
+            <small class="block text-500">Use inline style objects</small>
+          </label>
+        </div>
+      </div>
+    </div>
+    -->
+
+    <!-- Pretty Print -->
+    <div class="field mb-4">
+      <label class="block text-900 font-semibold mb-3">Formatting</label>
+      <div class="flex align-items-center">
+        <p-checkbox
+          [(ngModel)]="prettyPrint"
+          [binary]="true"
+          inputId="pretty"
+        ></p-checkbox>
+        <label for="pretty" class="ml-2 cursor-pointer">
+          <span class="font-medium">Pretty Print</span>
+          <small class="block text-500">Format JSON with indentation (2 spaces)</small>
+        </label>
+      </div>
+    </div>
+
+    <!-- Include Values -->
+    <div class="field mb-4">
+      <label class="block text-900 font-semibold mb-3">Data Options</label>
+      <div class="flex flex-column gap-3">
+        <div class="flex align-items-center">
+          <p-checkbox
+            [(ngModel)]="includeValues"
+            [binary]="true"
+            inputId="values"
+          ></p-checkbox>
+          <label for="values" class="ml-2 cursor-pointer">
+            <span class="font-medium">Include Field Values</span>
+            <small class="block text-500">Export current form values (for testing)</small>
+          </label>
+        </div>
+        <div class="flex align-items-center">
+          <p-checkbox
+            [(ngModel)]="includeEmptyFields"
+            [binary]="true"
+            inputId="empty"
+          ></p-checkbox>
+          <label for="empty" class="ml-2 cursor-pointer">
+            <span class="font-medium">Include Empty Properties</span>
+            <small class="block text-500">Export null/empty fields</small>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview - COMMENTED FOR FUTURE USE -->
+    <!--
+    <div class="surface-100 border-round p-3 mt-4">
+      <p class="text-sm font-semibold mb-2">Preview:</p>
+      <code class="text-xs">
+        {{ styleFormat === 'tailwind' ? 'class="w-full p-2"' : 'style="width: 100%; padding: 8px"' }}
+      </code>
+    </div>
+    -->
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cancel"
+      icon="pi pi-times"
+      class="p-button-text"
+      (click)="onCancel()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="buttonLabel"
+      [icon]="buttonIcon"
+      (click)="onExport()"
+    ></button>
+  </ng-template>
+</p-dialog>

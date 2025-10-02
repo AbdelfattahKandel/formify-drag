@@ -56,6 +56,13 @@ export function importMultiPageSchema(json: string): PageConfig[] {
 export function isMultiPageFormat(json: string): boolean {
   try {
     const parsed = JSON.parse(json);
+    
+    // New format: { forms: { groupName: [...] } }
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return 'forms' in parsed && typeof parsed.forms === 'object';
+    }
+    
+    // Old format: [{ pageName: { groups: {...} } }]
     if (!Array.isArray(parsed) || parsed.length === 0) {
       return false;
     }

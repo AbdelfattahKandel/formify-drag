@@ -88,19 +88,54 @@ export class SchemaSerializerService {
     }
 
     // Leaf control
+    const data: any = {
+      formControlName: key,
+      fieldType: (field as any).fieldType || (field as any).type,
+      value: (field as any).value ?? null,
+      label: (field as any).label,
+      placeholder: (field as any).placeholder,
+      required: (field as any).required,
+      disabled: (field as any).disabled,
+      readonly: (field as any).readonly,
+      options: (field as any).options,
+      validators: (field as any).validators,
+    };
+    
+    // Add enhanced properties if they exist
+    if ((field as any).uiConfig) {
+      data.uiConfig = (field as any).uiConfig;
+    }
+    
+    if ((field as any).validations) {
+      data.validations = (field as any).validations;
+    }
+    
+    if ((field as any).computed) {
+      data.computed = (field as any).computed;
+    }
+    
+    if ((field as any).conditionalLogic) {
+      data.conditionalLogic = (field as any).conditionalLogic;
+    }
+    
+    if ((field as any).dataSourceConfig) {
+      data.dataSourceConfig = (field as any).dataSourceConfig;
+    }
+    
+    if ((field as any).permissions) {
+      data.permissions = (field as any).permissions;
+    }
+    
+    if ((field as any).events) {
+      data.events = (field as any).events;
+    }
+    
+    if ((field as any).cssClasses) {
+      data.cssClasses = (field as any).cssClasses;
+    }
+    
     return {
-      data: {
-        formControlName: key,
-        fieldType: (field as any).fieldType || (field as any).type,
-        value: (field as any).value ?? null,
-        label: (field as any).label,
-        placeholder: (field as any).placeholder,
-        required: (field as any).required,
-        disabled: (field as any).disabled,
-        readonly: (field as any).readonly,
-        options: (field as any).options,
-        validators: (field as any).validators,
-      },
+      data,
       style: (field as any).fieldStyle,
     };
   }
@@ -124,25 +159,26 @@ export class SchemaSerializerService {
   }
 
   /**
-   * Builds multi-page export schema from pages configuration
+   * Builds export schema from pages configuration (NEW STRUCTURE: forms only)
    */
-  buildMultiPageExportSchema(pages: PageConfig[]): MultiPageExportFormat {
-    return pages.map((page) => ({
-      [page.pageName]: {
-        groups: Object.entries(page.groups).reduce(
-          (acc, [groupName, groupConfig]) => {
-            acc[groupName] = groupConfig.forms.map((form) => ({
-              id: form.id,
-              formGroup: form.formGroup || `${groupName}_group`,
-              containerStyle: form.containerStyle || this.getContainerStyle(),
-              controls: form.controls || [],
-            }));
-            return acc;
-          },
-          {} as Record<string, unknown[]>
-        ),
-      },
-    }));
+  buildMultiPageExportSchema(pages: PageConfig[]): any {
+    // New structure: { forms: { groupName: [...forms] } }
+    const formsObject: Record<string, unknown[]> = {};
+    
+    pages.forEach((page) => {
+      Object.entries(page.groups).forEach(([groupName, groupConfig]) => {
+        formsObject[groupName] = groupConfig.forms.map((form) => ({
+          id: form.id,
+          formGroup: form.formGroup || `${groupName}_group`,
+          containerStyle: form.containerStyle || this.getContainerStyle(),
+          controls: form.controls || [],
+        }));
+      });
+    });
+    
+    return {
+      forms: formsObject
+    };
   }
 
   /**
@@ -154,65 +190,96 @@ export class SchemaSerializerService {
   }
 
   /**
-   * Imports multi-page schema from JSON string
+   * Imports schema from JSON string (NEW STRUCTURE: forms only, no pages)
    */
   importMultiPage(json: string): PageConfig[] {
     try {
       const parsed = JSON.parse(json);
 
-      if (!Array.isArray(parsed)) {
-        throw new Error('Multi-page schema must be an array');
+      // New structure: { forms: { groupName: [...forms] } }
+      if (!parsed.forms || typeof parsed.forms !== 'object') {
+        throw new Error('Invalid schema: "forms" object is required');
       }
 
-      return parsed.map((pageObj) => {
-        const pageName = Object.keys(pageObj)[0];
-        const pageData = pageObj[pageName];
+      // Create a single default page containing all groups
+      const defaultPageName = 'forms';
+      const groups = Object.entries(parsed.forms).reduce(
+        (acc, [groupName, forms]) => {
+          if (!Array.isArray(forms)) {
+            throw new Error(`Invalid forms array for group "${groupName}"`);
+          }
 
-        if (!pageData || !pageData.groups) {
-          throw new Error(`Invalid page structure for "${pageName}"`);
-        }
-
-        const groups = Object.entries(pageData.groups).reduce(
-          (acc, [groupName, forms]) => {
-            if (!Array.isArray(forms)) {
-              throw new Error(`Invalid forms array for group "${groupName}"`);
-            }
-
-            acc[groupName] = {
+          acc[groupName] = {
+            groupName,
+            forms: (forms as any[]).map((form) => ({
+              id: form.id,
+              formGroup: form.formGroup,
               groupName,
-              forms: (forms as any[]).map((form) => ({
-                id: form.id,
-                formGroup: form.formGroup,
-                groupName,
-                pageName,
-                containerStyle: form.containerStyle,
-                controls: form.controls,
-              })),
-            };
+              pageName: defaultPageName,
+              containerStyle: form.containerStyle,
+              controls: this.convertControlsToFieldConfig(form.controls || []),
+            })),
+          };
 
-            return acc;
-          },
-          {} as Record<string, any>
-        );
+          return acc;
+        },
+        {} as Record<string, any>
+      );
 
-        return {
-          pageName,
-          groups,
-        };
-      });
+      return [{
+        pageName: defaultPageName,
+        groups,
+      }];
     } catch (error) {
-      console.error('Failed to import multi-page schema:', error);
-      throw new Error('Invalid multi-page schema format');
+      console.error('Failed to import schema:', error);
+      throw new Error('Invalid schema format');
     }
   }
 
   /**
-   * Detects if JSON is multi-page format or legacy single-page format
+   * Convert imported controls to FieldConfig format
+   */
+  private convertControlsToFieldConfig(controls: any[]): FieldConfig[] {
+    return controls.map((control: any) => {
+      const data = control.data || {};
+      const style = control.style || {};
+      
+      return {
+        id: data.formControlName || `field_${Math.random().toString(36).substr(2, 9)}`,
+        kind: 'control',
+        key: data.formControlName,
+        formControl: data.formControlName,
+        type: data.fieldType,
+        fieldType: data.fieldType,
+        label: data.label,
+        placeholder: data.placeholder,
+        value: data.value,
+        required: data.required,
+        disabled: data.disabled,
+        readonly: data.readonly,
+        options: data.options,
+        validators: data.validators,
+        fieldStyle: style,
+        uiConfig: data.uiConfig,
+        validations: data.validations,
+        computed: data.computed,
+        conditionalLogic: data.conditionalLogic,
+        dataSourceConfig: data.dataSourceConfig,
+        permissions: data.permissions,
+        events: data.events,
+        cssClasses: data.cssClasses,
+      } as any;
+    });
+  }
+
+  /**
+   * Detects if JSON is the new format with "forms" object
    */
   isMultiPageFormat(json: string): boolean {
     try {
       const parsed = JSON.parse(json);
-      return Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object';
+      // New format: { forms: { ... } }
+      return parsed && typeof parsed === 'object' && parsed.forms && typeof parsed.forms === 'object';
     } catch {
       return false;
     }

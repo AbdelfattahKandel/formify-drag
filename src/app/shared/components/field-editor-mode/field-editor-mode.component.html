@@ -12,11 +12,13 @@
   [baseZIndex]="10000"
 >
   <div class="field-editor p-fluid">
-    <div class="field">
-      <label for="fieldLabel" class="block text-900 font-medium mb-2"> Field Label </label>
-
-      <input id="fieldLabel" type="text" pInputText [(ngModel)]="field.label" class="w-full" placeholder="Enter field label" required />
-    </div>
+    <p-tabView>
+      <!-- Tab 1: Basic -->
+      <p-tabPanel header="Basic">
+        <div class="field">
+          <label for="fieldLabel" class="block text-900 font-medium mb-2"> Field Label </label>
+          <input id="fieldLabel" type="text" pInputText [(ngModel)]="field.label" class="w-full" placeholder="Enter field label" required />
+        </div>
 
     <div class="field mt-4">
       <label id="req">Required Field</label>
@@ -156,10 +158,132 @@
       <input id="placeholder" type="text" pInputText [(ngModel)]="field.placeholder" class="w-full" placeholder="Enter placeholder text" />
     </div>
 
-    <div class="field mt-4">
-      <label for="value" class="block text-900 font-medium mb-2">Value</label>
-      <input id="value" type="text" pInputText [(ngModel)]="field.value" class="w-full" placeholder="Enter value" />
-    </div>
+        <div class="field mt-4">
+          <label for="value" class="block text-900 font-medium mb-2">Value</label>
+          <input id="value" type="text" pInputText [(ngModel)]="field.value" class="w-full" placeholder="Enter value" />
+        </div>
+      </p-tabPanel>
+
+      <!-- Tab 2: UI Customization -->
+      <p-tabPanel header="UI">
+        <div class="field">
+          <label for="uiIcon" class="block text-900 font-medium mb-2">Icon</label>
+          <input id="uiIcon" type="text" pInputText [(ngModel)]="uiIcon" class="w-full" placeholder="pi pi-user" />
+          <small class="text-500">PrimeNG icon class (e.g., pi pi-user, pi pi-envelope)</small>
+        </div>
+
+        <div class="field mt-4">
+          <label for="uiHelpText" class="block text-900 font-medium mb-2">Help Text</label>
+          <input id="uiHelpText" type="text" pInputText [(ngModel)]="uiHelpText" class="w-full" placeholder="Additional help text" />
+        </div>
+
+        <!-- <div class="field mt-4">
+          <label for="uiPrefix" class="block text-900 font-medium mb-2">Prefix</label>
+          <input id="uiPrefix" type="text" pInputText [(ngModel)]="uiPrefix" class="w-full" placeholder="$ or #" />
+        </div>
+
+        <div class="field mt-4">
+          <label for="uiSuffix" class="block text-900 font-medium mb-2">Suffix</label>
+          <input id="uiSuffix" type="text" pInputText [(ngModel)]="uiSuffix" class="w-full" placeholder="USD or kg" />
+        </div> -->
+
+        <div class="field mt-4">
+          <label class="block text-900 font-medium mb-2">Character Counter</label>
+          <p-checkbox [(ngModel)]="showCharCounter" [binary]="true" label="Enable character counter"></p-checkbox>
+          @if (showCharCounter) {
+            <p-inputNumber
+              [(ngModel)]="charCounterMax"
+              [min]="1"
+              [showButtons]="true"
+              placeholder="Max characters"
+              class="w-full mt-2"
+            ></p-inputNumber>
+          }
+        </div>
+      </p-tabPanel>
+
+      <!-- Tab 3: Validation -->
+      <p-tabPanel header="Validation">
+        <div class="field">
+          <label class="block text-900 font-medium mb-2">Required Field</label>
+          <p-checkbox [(ngModel)]="isRequired" [binary]="true" label="This field is required"></p-checkbox>
+        </div>
+
+        <div class="field mt-4">
+          <label for="validationMinLength" class="block text-900 font-medium mb-2">Minimum Length</label>
+          <p-inputNumber
+            id="validationMinLength"
+            [(ngModel)]="validationMinLength"
+            [min]="0"
+            [showButtons]="true"
+            placeholder="Min characters"
+            class="w-full"
+          ></p-inputNumber>
+        </div>
+
+        <div class="field mt-4">
+          <label for="validationMaxLength" class="block text-900 font-medium mb-2">Maximum Length</label>
+          <p-inputNumber
+            id="validationMaxLength"
+            [(ngModel)]="validationMaxLength"
+            [min]="0"
+            [showButtons]="true"
+            placeholder="Max characters"
+            class="w-full"
+          ></p-inputNumber>
+        </div>
+
+        <div class="field mt-4">
+          <label for="regexPattern" class="block text-900 font-medium mb-2">Pattern (Regex)</label>
+          <input
+            id="regexPattern"
+            type="text"
+            pInputText
+            [(ngModel)]="field.pattern"
+            class="w-full"
+            placeholder="^[A-Za-z0-9_]+$"
+          />
+          <small class="text-500">Regular expression for validation</small>
+        </div>
+
+        <div class="field mt-4">
+          <label for="errorMessage" class="block text-900 font-medium mb-2">Custom Error Message</label>
+          <textarea
+            id="errorMessage"
+            rows="2"
+            pInputTextarea
+            [(ngModel)]="customErrorMessage"
+            class="w-full"
+            placeholder="This field is invalid"
+          ></textarea>
+          <small class="text-500">Custom message to show on validation error</small>
+        </div>
+
+        @if (field.type === 'input-number') {
+          <div class="field mt-4">
+            <label for="validationMin" class="block text-900 font-medium mb-2">Minimum Value</label>
+            <p-inputNumber
+              id="validationMin"
+              [(ngModel)]="validationMin"
+              [showButtons]="true"
+              placeholder="Min value"
+              class="w-full"
+            ></p-inputNumber>
+          </div>
+
+          <div class="field mt-4">
+            <label for="validationMax" class="block text-900 font-medium mb-2">Maximum Value</label>
+            <p-inputNumber
+              id="validationMax"
+              [(ngModel)]="validationMax"
+              [showButtons]="true"
+              placeholder="Max value"
+              class="w-full"
+            ></p-inputNumber>
+          </div>
+        }
+      </p-tabPanel>
+    </p-tabView>
   </div>
 
   <ng-template pTemplate="footer">

@@ -2,6 +2,7 @@ import { FieldStyle } from './field-style';
 import { FieldType } from './type-field';
 import { ValidatorConfig } from './validator-config';
 import { FormControl } from '@angular/forms';
+import { UIConfig, ComputedConfig, AdvancedValidation, ConditionalConfig, DataSourceConfig, PermissionsConfig } from './enhanced-field-config';
 
 export type LegacyExtras = {
   id?: string | number;
@@ -37,7 +38,38 @@ export type LegacyExtras = {
   styles?: Record<string, any>;
   css?: Record<string, any>;
   
+  // Enhanced features
+  uiConfig?: UIConfig;
+  computed?: ComputedConfig;
+  validations?: AdvancedValidation;
+  conditionalLogic?: ConditionalConfig[];
+  dataSourceConfig?: DataSourceConfig;
+  permissions?: PermissionsConfig;
+  
+  // Events
+  events?: {
+    onChange?: string;
+    onBlur?: string;
+    onFocus?: string;
+  };
+  
+  // Custom CSS
+  cssClasses?: {
+    container?: string;
+    label?: string;
+    input?: string;
+    error?: string;
+    helpText?: string;
+  };
+  
+  // Field dependencies
+  dependencies?: {
+    dependsOn: string;
+    dataSource?: DataSourceConfig;
+    trigger?: 'change' | 'blur';
+  };
 };
+
 export interface FieldConfig extends LegacyExtras {
   kind: 'control' | 'group' | 'array';
   key: string;

@@ -12,6 +12,8 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { TooltipModule } from 'primeng/tooltip';
+import { TabViewModule } from 'primeng/tabview';
+import { InputTextarea } from 'primeng/inputtextarea';
 import { FieldConfig } from '../../../core/models/interfaces/legacy-extras';
 import { FieldType } from '../../../core/models/interfaces/type-field';
 import { Select } from "primeng/select";
@@ -37,6 +39,8 @@ interface FieldTypeOption {
     InputGroupModule,
     InputGroupAddonModule,
     TooltipModule,
+    TabViewModule,
+    InputTextarea,
     Select
 ],
   templateUrl: './field-editor-mode.component.html',
@@ -111,6 +115,22 @@ export class FieldEditorMossdeComponent implements OnChanges {
 
   chipValues: string[] = [];
 
+  // Enhanced features properties
+  uiIcon: string = '';
+  uiIconPosition: 'left' | 'right' = 'left';
+  uiHelpText: string = '';
+  uiPrefix: string = '';
+  uiSuffix: string = '';
+  showCharCounter: boolean = false;
+  charCounterMax: number = 500;
+  
+  // Validation properties
+  validationMinLength: number = 0;
+  validationMaxLength: number = 0;
+  validationMin: number | undefined;
+  validationMax: number | undefined;
+  customErrorMessage: string = '';
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['field'] && this.field.options) {
       this.chipValues = this.field.options.map((opt: any) =>
@@ -144,6 +164,39 @@ export class FieldEditorMossdeComponent implements OnChanges {
     const fieldId = this._field.id || this.generateId();
     const fieldKey = this._field.formControl || `field_${fieldType}_${Date.now()}`;
     const kind = (this._field as any).kind || ('control' as any);
+    
+    // Load UI Config if exists
+    if (this._field.uiConfig) {
+      this.uiIcon = this._field.uiConfig.icon || '';
+      this.uiIconPosition = this._field.uiConfig.iconPosition || 'left';
+      this.uiHelpText = this._field.uiConfig.helpText || '';
+      this.uiPrefix = this._field.uiConfig.prefix || '';
+      this.uiSuffix = this._field.uiConfig.suffix || '';
+      
+      if (this._field.uiConfig.characterCounter) {
+        this.showCharCounter = this._field.uiConfig.characterCounter.enabled || false;
+        this.charCounterMax = this._field.uiConfig.characterCounter.max || 500;
+      }
+    }
+    
+    // Load Validations if exists
+    if (this._field.validations) {
+      if (this._field.validations.minLength) {
+        this.validationMinLength = this._field.validations.minLength.value || 0;
+      }
+      if (this._field.validations.maxLength) {
+        this.validationMaxLength = this._field.validations.maxLength.value || 0;
+      }
+      if (this._field.validations.min) {
+        this.validationMin = this._field.validations.min.value;
+      }
+      if (this._field.validations.max) {
+        this.validationMax = this._field.validations.max.value;
+      }
+      if (this._field.validations.required) {
+        this.customErrorMessage = this._field.validations.required.message || '';
+      }
+    }
 
     // Create a new field with default values and merge with existing field
     this._field = {
@@ -190,6 +243,24 @@ export class FieldEditorMossdeComponent implements OnChanges {
   }
 
   onSave() {
+    console.log('🔍 [Field Editor] Current validation values:', {
+      validationMinLength: this.validationMinLength,
+      validationMaxLength: this.validationMaxLength,
+      validationMin: this.validationMin,
+      validationMax: this.validationMax,
+      customErrorMessage: this.customErrorMessage,
+      isRequired: this.isRequired
+    });
+    
+    console.log('🔍 [Field Editor] Current UI values:', {
+      uiIcon: this.uiIcon,
+      uiHelpText: this.uiHelpText,
+      uiPrefix: this.uiPrefix,
+      uiSuffix: this.uiSuffix,
+      showCharCounter: this.showCharCounter,
+      charCounterMax: this.charCounterMax
+    });
+    
     // Update options from chips if needed
     if (this.chipValues && this.chipValues.length > 0) {
       this._field.options = this.chipValues
@@ -202,7 +273,7 @@ export class FieldEditorMossdeComponent implements OnChanges {
       this._field.options = [];
     }
 
-    // Ensure we emit fieldStyle (not style) and canonical type values
+    // Build base payload
     const payload: FieldConfig = {
       ...(this._field as any),
       kind: (this._field as any).kind || ('control' as any),
@@ -211,6 +282,75 @@ export class FieldEditorMossdeComponent implements OnChanges {
       type: this._field.type as any
     } as any;
 
+    // Add UI Config only if any field is filled
+    if (this.uiIcon || this.uiHelpText || this.uiPrefix || this.uiSuffix || this.showCharCounter) {
+      payload.uiConfig = {};
+      
+      if (this.uiIcon) payload.uiConfig.icon = this.uiIcon;
+      if (this.uiIconPosition) payload.uiConfig.iconPosition = this.uiIconPosition;
+      if (this.uiHelpText) payload.uiConfig.helpText = this.uiHelpText;
+      if (this.uiPrefix) payload.uiConfig.prefix = this.uiPrefix;
+      if (this.uiSuffix) payload.uiConfig.suffix = this.uiSuffix;
+      
+      if (this.showCharCounter) {
+        payload.uiConfig.characterCounter = {
+          enabled: true,
+          max: this.charCounterMax,
+          showRemaining: true
+        };
+      }
+    }
+
+    // Add Advanced Validations only if configured
+    const hasValidations = this.validationMinLength > 0 || 
+                          this.validationMaxLength > 0 || 
+                          this.customErrorMessage || 
+                          this.validationMin !== undefined || 
+                          this.validationMax !== undefined ||
+                          this.isRequired;
+    
+    if (hasValidations) {
+      payload.validations = {};
+      
+      if (this.isRequired) {
+        payload.validations.required = {
+          value: true,
+          message: this.customErrorMessage || 'This field is required'
+        };
+      }
+      
+      if (this.validationMinLength > 0) {
+        payload.validations.minLength = {
+          value: this.validationMinLength,
+          message: `Minimum length is ${this.validationMinLength} characters`
+        };
+      }
+      
+      if (this.validationMaxLength > 0) {
+        payload.validations.maxLength = {
+          value: this.validationMaxLength,
+          message: `Maximum length is ${this.validationMaxLength} characters`
+        };
+      }
+      
+      if (this.validationMin !== undefined && this.validationMin !== null) {
+        payload.validations.min = {
+          value: this.validationMin,
+          message: `Minimum value is ${this.validationMin}`
+        };
+      }
+      
+      if (this.validationMax !== undefined && this.validationMax !== null) {
+        payload.validations.max = {
+          value: this.validationMax,
+          message: `Maximum value is ${this.validationMax}`
+        };
+      }
+      
+      console.log('✅ [Validation] Added:', payload.validations);
+    }
+
+    console.log('💾 [Field Editor] Saving field with enhancements:', payload);
     this.save.emit(payload);
     this.visible = false;
   }

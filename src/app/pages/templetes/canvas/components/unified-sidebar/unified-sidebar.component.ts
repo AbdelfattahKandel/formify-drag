@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 import { ScrollingModule } from '@angular/cdk/scrolling';
@@ -8,6 +8,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { BadgeModule } from 'primeng/badge';
 import { PageConfig } from '../../../../../core/models/interfaces/page-config';
 import { FieldConfig } from '../../../../../core/models/interfaces/legacy-extras';
+import { AddFormDialogComponent } from '../../../../../shared/components/add-form-dialog/add-form-dialog.component';
 
 @Component({
   selector: 'app-unified-sidebar',
@@ -21,6 +22,7 @@ import { FieldConfig } from '../../../../../core/models/interfaces/legacy-extras
     ButtonModule,
     TooltipModule,
     BadgeModule,
+    AddFormDialogComponent,
   ],
   templateUrl: './unified-sidebar.component.html',
   styleUrl: './unified-sidebar.component.css',
@@ -39,7 +41,7 @@ export class UnifiedSidebarComponent {
   pageAdd = output<void>();
   pageRemove = output<string>();
   groupSelect = output<string>();
-  groupAdd = output<void>();
+  groupAdd = output<string>(); // Changed: now emits the group name directly
   groupRemove = output<string>();
 
   // Memoized computed values for performance
@@ -49,6 +51,9 @@ export class UnifiedSidebarComponent {
   
   // Check if there are many items (for virtual scrolling threshold)
   shouldUseVirtualScroll = computed(() => this.paletteTools().length > 20);
+  
+  // Add form dialog
+  showAddFormDialog = signal(false);
 
   // Pages methods
   onSelectPage(pageName: string): void {
@@ -74,7 +79,12 @@ export class UnifiedSidebarComponent {
   }
 
   onAddGroup(): void {
-    this.groupAdd.emit();
+    this.showAddFormDialog.set(true);
+  }
+
+  onFormAdded(formName: string): void {
+    console.log('Form added:', formName);
+    this.groupAdd.emit(formName);
   }
 
   onRemoveGroup(groupName: string, event: Event): void {
