@@ -19,9 +19,10 @@ import { SelectbuttonComponent } from '../../../shared/components/controls/prime
 import { TextareaComponent } from '../../../shared/components/controls/primeng-controls/textarea/textarea.component';
 import { TogglebuttonComponent } from '../../../shared/components/controls/primeng-controls/togglebutton/togglebutton.component';
 import { ToggleswitchComponent } from '../../../shared/components/controls/primeng-controls/toggleswitch/toggleswitch.component';
-import { ContainerFormgroupComponent } from '../../../shared/components/container-formgroup/container-formgroup.component';
 import { ContainerFormarrayComponent } from '../../../shared/components/container-formarray/container-formarray.component';
 import { ImagefieldComponent } from "../../../shared/components/controls/primeng-controls/imagefield/imagefield.component";
+import { AttachmentComponent } from "../../../shared/components/controls/primeng-controls/attachment/attachment.component";
+import { ImageInputComponent } from "../../../shared/components/controls/primeng-controls/image-input/image-input.component";
 
 
 
@@ -47,14 +48,14 @@ import { ImagefieldComponent } from "../../../shared/components/controls/primeng
     RadiobuttonComponent,
     SelectComponent,
     SelectbuttonComponent,
-    TextareaComponent,
     TogglebuttonComponent,
     ToggleswitchComponent,
     // Container containers (wrapped to avoid circular import eval order)
-    forwardRef(() => ContainerFormgroupComponent),
     forwardRef(() => ContainerFormarrayComponent),
-    ImagefieldComponent
-  ],
+    AttachmentComponent,
+    ImageInputComponent,
+    TextareaComponent
+],
   templateUrl: './rerender.component.html',
   styleUrl: './rerender.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -66,6 +67,7 @@ export class RerenderComponent {
   @Input() isRowSelected = false;
   @Input() formGroup: FormGroup = new FormGroup({});
   @Output() editRequested = new EventEmitter<void>();
+  @Output() fieldEditRequested = new EventEmitter<FieldConfig>();
 
   showEditModal = false;
   isDragging = false;
@@ -78,6 +80,7 @@ export class RerenderComponent {
 
   // Allow all drags to enter nested drop lists (match CDK signature)
   alwaysTrue = (_drag?: any, _drop?: any) => true;
+  arrayEditMode!: boolean;
 
   constructor(private _fbService: CreateformbuilderService) {}
 
@@ -212,7 +215,7 @@ export class RerenderComponent {
   }
   
   getColumnClass(): string {
-    const cols = (this.field as any).fieldStyle?.columns || 12;
+    const cols = (this.field as any).fieldStyle?.columns || 4;
     return `col-${cols}`;
   }
 
@@ -286,5 +289,45 @@ export class RerenderComponent {
     };
     this._fbService.addChildToGroup(parent, child);
   }
-
+  onSubmit() {
+    if (this.getType() === 'submit') {
+      const buttonData = {
+        data: {
+          fieldType: 'button',
+          action: 'submit',
+          label: this.field.label || 'Submit'
+        },
+        style: {
+          columns: this.field.fieldStyle?.columns || 4,
+          width: this.field.fieldStyle?.width || '100%',
+          // Include any additional CSS styles from the button
+          css: {
+            backgroundColor: this.field.fieldStyle?.backgroundColor || '#3b82f6',
+            color: '#ffffff',
+            padding: this.field.fieldStyle?.padding || '0.5rem 1rem',
+            borderRadius: this.field.fieldStyle?.borderRadius || '9999px',
+            border: this.field.fieldStyle?.border || 'none',
+            cursor: 'pointer',
+            fontSize: '1rem',
+            fontWeight: 500,
+            textAlign: this.field.fieldStyle?.textAlign || 'center',
+            textDecoration: 'none',
+            display: 'inline-block',
+            transition: 'all 0.3s ease-in-out',
+            '&:hover': {
+              backgroundColor: '#2563eb',
+              color: '#ffffff'
+            }
+          }
+        }
+      };
+      
+      // console.log(JSON.stringify(buttonData, null, 2));
+      return buttonData;
+    }
+    
+    // For non-submit buttons or other form submissions
+    // console.log(this.formGroup.value);
+    return this.formGroup.value;
+  }
 }

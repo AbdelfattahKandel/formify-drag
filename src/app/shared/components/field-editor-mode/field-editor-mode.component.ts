@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -13,6 +14,7 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { TooltipModule } from 'primeng/tooltip';
 import { FieldConfig } from '../../../core/models/interfaces/legacy-extras';
 import { FieldType } from '../../../core/models/interfaces/type-field';
+import { Select } from "primeng/select";
 
 interface FieldTypeOption {
   label: string;
@@ -34,8 +36,9 @@ interface FieldTypeOption {
     CheckboxModule,
     InputGroupModule,
     InputGroupAddonModule,
-    TooltipModule
-  ],
+    TooltipModule,
+    Select
+],
   templateUrl: './field-editor-mode.component.html',
   styleUrls: ['./field-editor-mode.component.css']
 })
@@ -159,7 +162,8 @@ export class FieldEditorMossdeComponent implements OnChanges {
       options: (this._field.options || []).map((opt: any) =>
         typeof opt === 'string' ? { label: opt, value: opt } : opt
       ),
-      validators: this._field.validators || []
+      validators: this._field.validators || [],
+      componentProps: (this._field as any).componentProps || {}
     };
 
     // Initialize chip values for options

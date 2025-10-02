@@ -16,14 +16,22 @@
     @case('select-button') { <app-selectbutton></app-selectbutton> }
     @case('toggle-button') { <app-togglebutton></app-togglebutton> }
     @case('toggle-switch') { <app-toggleswitch></app-toggleswitch> }
-    @case('group') { <app-container-formgroup [group]="field"></app-container-formgroup> }
-    @case('array') { <app-container-formarray [array]="field"></app-container-formarray> }
-    @case('imagefield') {
+    <!-- @case('group') { <app-container-formgroup [group]="field" [isEditMode]="isEditMode" [parentForm]="formGroup"></app-container-formgroup> } -->
+    @case('array') { <app-container-formarray [array]="field" [(arrayEditMode)]="arrayEditMode" [parentForm]="formGroup"></app-container-formarray> }
+
+    <!-- @case('imagefield') {
       <app-imagefield
         [field]="field"
-        [imagesInput]="getFormArray(field)">
+        [imagesInput]="getFormArray(field)"
+        [uploadUrl]="'http://10.4.30.8:7093/api/UploadStaticFile'"
+        [fileFieldName]="'File'"
+        [uploadFolder]="'any Folder'">
       </app-imagefield>
-    }
+    } -->
+      @case ('image-input') { <app-image-input [field]="field"></app-image-input> }
+    @case('attachment') { <app-attachment [field]="field"></app-attachment> }
+    @case('submit') { <button class="bg-green-500 text-white px-4 py-2 rounded-4xl hover:bg-green-600 hover:text-white transition-all duration-300 ease-in-out cursor-pointer w-full" (click)="onSubmit()">{{field.label}}</button>}
+    @case('button') { <button class="bg-green-500 text-white px-4 py-2 rounded-4xl hover:bg-green-600 hover:text-white transition-all duration-300 ease-in-out cursor-pointer w-full" (click)="onSubmit()">{{field.label || 'Button'}}</button>}
     
 
     

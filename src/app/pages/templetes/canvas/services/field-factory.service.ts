@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { FieldConfig } from '../../../../../core/models/interfaces/legacy-extras';
-import { v4 as uuidv4 } from 'uuid';
+import { FieldConfig } from '../../../../core/models/interfaces/legacy-extras';
+import { FormControl } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'
@@ -8,60 +8,62 @@ import { v4 as uuidv4 } from 'uuid';
 export class FieldFactoryService {
   private defaultFieldTemplates: { [key: string]: Omit<FieldConfig, 'id' | 'formControl'> } = {
     text: {
-      type: 'text',
+      kind: 'control' as any,
+      key: 'text',
+      type: 'input-text' as any,
       label: 'Text Input',
       placeholder: 'Enter text',
-      validators: { required: false },
-      style: { width: '100%' }
+      validators: [] as any,
+      fieldStyle: { width: '100%' } as any
     },
     number: {
-      type: 'number',
+      kind: 'control' as any,
+      key: 'number',
+      type: 'input-number' as any,
       label: 'Number',
       placeholder: 'Enter a number',
-      validators: { required: false },
-      style: { width: '100%' }
+      validators: [] as any,
+      fieldStyle: { width: '100%' } as any
     },
     email: {
-      type: 'email',
+      kind: 'control' as any,
+      key: 'email',
+      type: 'input-text' as any,
       label: 'Email',
       placeholder: 'Enter email',
-      validators: { required: false, email: true },
-      style: { width: '100%' }
+      validators: [{ name: 'email' } as any],
+      fieldStyle: { width: '100%' } as any
     },
     // Add more field types as needed
   };
 
   createField(type: string, customProps: Partial<FieldConfig> = {}): FieldConfig {
     const baseField = this.defaultFieldTemplates[type] || this.defaultFieldTemplates['text'];
-    const id = uuidv4();
-    const formControl = customProps.formControl || `${type}_${id.substring(0, 8)}`;
+    const formControl = (customProps.formControl && String(customProps.formControl)) || `${type}_${Date.now()}`;
     
     return {
       ...baseField,
-      id,
       formControl,
       ...customProps,
-      validators: { ...baseField.validators, ...(customProps.validators || {}) },
-      style: { ...baseField.style, ...(customProps.style || {}) }
+      validators: { ...(baseField as any).validators, ...((customProps as any).validators || {}) } as any,
+      fieldStyle: { ...(baseField as any).fieldStyle, ...((customProps as any).fieldStyle || {}) } as any
     };
   }
 
   createGroup(fields: FieldConfig[] = [], customProps: Partial<FieldConfig> = {}): FieldConfig {
     return {
-      id: uuidv4(),
-      type: 'group',
-      label: customProps.label || 'Group',
-      formControl: customProps.formControl || `group_${Date.now()}`,
-      fields: [...fields],
-      style: { ...customProps.style }
-    };
+      kind: 'group' as any,
+      label: (customProps as any).label || 'Group',
+      formControl: (customProps as any).formControl || `group_${Date.now()}`,
+      children: [...fields],
+      fieldStyle: { columns: 4, width: '100%', ...((customProps as any).fieldStyle || {}) } as any
+    } as any;
   }
 
   cloneField(field: FieldConfig): FieldConfig {
     return {
-      ...field,
-      id: uuidv4(),
+      ...(field as any),
       formControl: `${field.formControl}_${Date.now()}`
-    };
+    } as any;
   }
 }

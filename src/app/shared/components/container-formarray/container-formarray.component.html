@@ -5,41 +5,83 @@
     <h4 class="text-base font-semibold">{{ arrayLabel() }}</h4>
     }
     <div class="flex items-center gap-2">
-      <p-button icon="pi pi-plus" label="Add Item" styleClass="p-button-sm p-button-outlined" (onClick)="openAddDialog()"> </p-button>
-      <div class="flex flex-wrap items-center gap-2">
-        @for (tool of QUICK_ADD_ARRAY_TOOLS; track tool.type) {
-          <p-button [label]="tool.label" [styleClass]="tool.styleClass || 'p-button-sm'" (onClick)="onToolClick(tool)" />
-        }
-      </div>
+      <!-- <p-button
+        [icon]="arrayEditMode ? 'pi pi-check' : 'pi pi-pencil'"
+        [label]="arrayEditMode ? 'Done' : 'Edit Items'"
+        styleClass="p-button-sm p-button-outlined"
+        (onClick)="toggleEditMode()">
+      </p-button> -->
+      
+        <div class="flex flex-wrap items-center gap-2">
+          @for (tool of QUICK_ADD_ARRAY_TOOLS; track tool.type) {
+            <p-button [label]="tool.label" [styleClass]="tool.styleClass || 'p-button-sm'" (onClick)="onToolClick(tool)" />
+          
+          }
+        </div>
+
+        
+
     </div>
   </div>
 
-  <!-- Drop list container for array items -->
-  <div
-    cdkDropList
-    [id]="'array-' + arrayKey()"
-    [cdkDropListData]="items()"
-    (cdkDropListDropped)="onDrop($event)"
-    class="rounded border border-gray-300 p-3"
-  >
-    <div class="grid grid-cols-4 gap-4">
-      @for (item of items(); track item.id ?? item.key ?? $index) {
-      <div class="col-span-2" cdkDrag [cdkDragData]="item">
-        <div class="flex items-start gap-2">
-          <span cdkDragHandle class="pi pi-bars cursor-move mt-1 text-gray-500"></span>
-          <div class="flex-1">
-            <app-rerender
-              [field]="item"
-              [isEditMode]="isEditMode()"
-              [parent]="array()"
-              [formGroup]="effectiveForm">
-            </app-rerender>
+  @if (arrayEditMode) {
+    <!-- Template editor mode: configure children schema -->
+    <div
+      cdkDropList
+      [id]="'array-' + arrayKey()"
+      [cdkDropListData]="items()"
+      (cdkDropListDropped)="onDrop($event)"
+      class="rounded border border-gray-300 p-3"
+    >
+      <div class="grid grid-cols-4 gap-4">
+        @for (item of items(); track item.formControl ?? item.key ?? $index) {
+        <div class="col-span-2" cdkDrag [cdkDragData]="item">
+          <div class="flex items-start gap-2">
+            <span cdkDragHandle class="pi pi-bars cursor-move mt-1 text-gray-500"></span>
+            <div class="flex-1">
+              <app-rerender
+                [field]="item"
+                [isEditMode]="arrayEditMode"
+                [parent]="array()"
+                [formGroup]="effectiveForm"
+                (editRequested)="onChildEdit(item)">
+              </app-rerender>
+            </div>
           </div>
         </div>
+        }
       </div>
+    </div>
+  } @else {
+    <!-- Runtime mode: render FormArray items using template children -->
+    <div class="rounded border border-gray-300 p-3 space-y-3">
+      <div class="flex justify-between items-center">
+        <span class="text-xs text-gray-500">Items: {{ formArray?.length || 0 }}</span>
+        <p-button label="Add Item" icon="pi pi-plus" styleClass="p-button-sm" (onClick)="addItem()" />
+      </div>
+      @for (itemGroup of formArrayGroups(); track $index) {
+          <div class="rounded border border-gray-200 p-3">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm text-gray-500">Item #{{$index + 1}}</span>
+              <p-button icon="pi pi-trash" styleClass="p-button-text p-button-danger p-button-sm" (onClick)="removeItem($index)" />
+            </div>
+            <div class="grid grid-cols-4 gap-4">
+              @for (tmpl of items(); track tmpl.formControl ?? tmpl.key ?? $index) {
+                <div class="col-span-2">
+                  <app-rerender
+                    [field]="tmpl"
+                    [isEditMode]="false"
+                    [parent]="array()"
+                    [formGroup]="itemGroup"
+                    (editRequested)="onChildEdit(tmpl)">
+                  </app-rerender>
+                </div>
+              }
+            </div>
+          </div>
       }
     </div>
-  </div>
+  }
 </div>
 
 <!-- Add Item Dialog -->
@@ -68,12 +110,25 @@
         <option value="select">Select</option>
         <option value="checkbox">Checkbox</option>
         <option value="imagefield">Images</option>
-        <option value="array">Array</option>
+        <option value="group">Group</option>
+        <option value="numberfield">Numberfield</option>
+        <option value="email">Email</option>
+        <option value="password">Password</option>
+        <option value="datepicker">Datepicker</option>
+        <option value="multiselect">Multiselect</option>
+        <option value="radio">Radio</option>
       </select>
     </div>
-    <div class="flex justify-end gap-2 pt-2">
-      <p-button label="Cancel" styleClass="p-button-text" (onClick)="closeAddDialog()" />
       <p-button label="Add" icon="pi pi-check" [disabled]="addItemForm.invalid" (onClick)="confirmAdd()" />
-    </div>
+    
   </form>
 </p-dialog>
+
+@if (showFieldEditDialog() && selectedTemplateField) {
+  <app-field-editor-mode
+    [field]="selectedTemplateField!"
+    [visible]="showFieldEditDialog()"
+    (save)="onArrayFieldSaved($event)"
+    (cancel)="closeEditDialog()"
+  ></app-field-editor-mode>
+}

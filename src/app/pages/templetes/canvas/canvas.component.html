@@ -64,6 +64,10 @@
             <p-button icon="pi pi-code" label="Generate JSON" (onClick)="generateJson()"
               styleClass="p-button-sm p-button-success">
             </p-button>
+            <p-button icon="pi pi-upload" label="Import JSON" (onClick)="triggerImportJson()"
+              styleClass="p-button-sm">
+            </p-button>
+            <input #importJsonInput type="file" accept="application/json" class="hidden" (change)="onImportJsonSelected($event)" />
           </div>
         </div>
   

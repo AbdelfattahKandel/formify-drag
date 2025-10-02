@@ -1,0 +1,40 @@
+<div class="image-uploader-container" (click)="$event.stopPropagation()" (mousedown)="$event.stopPropagation()">
+  <div class="image-cards-container">
+    <div class="image-card border-2 border-gray-400">
+      <!-- Image Preview -->
+      <div class="image-preview">
+        @if (imageUrl) {
+          <p-image 
+            [src]="imageUrl" 
+            alt="Preview" 
+            styleClass="preview-img">
+          </p-image>
+        } @else {
+          <div class="empty-preview flex flex-col items-center justify-center py-4">
+            <i class="pi pi-image" style="font-size: 2rem"></i>
+            <span>No Image</span>
+          </div>
+        }
+      </div>
+
+      <!-- Card Footer with Upload Button -->
+      <div class="card-footer">
+        <input 
+          type="file" 
+          #fileInput 
+          (change)="onFileSelected($event)" 
+          class="hidden" />
+
+        <div class="flex gap-2">
+          <p-button 
+            icon="pi pi-upload" 
+            (onClick)="triggerFileInput(); $event.stopPropagation()"
+            label="Upload"
+            styleClass="p-button-outlined p-button-sm flex-1"
+            [style]="{'min-width': '100px'}">
+          </p-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

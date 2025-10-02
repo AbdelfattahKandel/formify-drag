@@ -30,23 +30,28 @@
     (cdkDropListDropped)="onDrop($event)"
     class="rounded border border-gray-300 p-3"
   >
-    <div class="grid grid-cols-12 gap-4">
+    <div class="grid grid-cols-4 gap-4">
       @for (child of children(); track child.id ?? child.key ?? $index) {
         @if (child.kind === 'group') {
-          <div class="col-span-12" cdkDrag [cdkDragData]="child">
+          <div class="col-span-4" cdkDrag [cdkDragData]="child">
             <div class="flex items-start gap-2">
               <span cdkDragHandle class="pi pi-bars cursor-move mt-1 text-gray-500"></span>
               <div class="flex-1">
-                <app-container-formgroup [group]="child"></app-container-formgroup>
+                <app-container-formgroup [group]="child" [isEditMode]="isEditMode()" [parentForm]="effectiveForm"></app-container-formgroup>
               </div>
             </div>
           </div>
         } @else {
-          <div class="col-span-12" cdkDrag [cdkDragData]="child">
+          <div class="col-span-4س" cdkDrag [cdkDragData]="child">
             <div class="flex items-start gap-2">
               <span cdkDragHandle class="pi pi-bars cursor-move mt-1 text-gray-500"></span>
               <div class="flex-1">
-                <app-rerender [field]="child"></app-rerender>
+                <app-rerender
+                  [field]="child"
+                  [isEditMode]="isEditMode()"
+                  [parent]="group()"
+                  [formGroup]="effectiveForm!">
+                </app-rerender>
               </div>
             </div>
           </div>

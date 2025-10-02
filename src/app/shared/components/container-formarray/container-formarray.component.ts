@@ -1,14 +1,17 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, input, signal, ChangeDetectorRef, forwardRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, input, signal, ChangeDetectorRef, forwardRef, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlContainer, FormArray, FormBuilder, FormGroup, FormGroupDirective, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CdkDrag, CdkDragHandle, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { RerenderComponent } from '../../../pages/templetes/rerender/rerender.component';
+import { FieldEditorMossdeComponent } from '../../components/field-editor-mode/field-editor-mode.component';
 import { FieldConfig } from '../../../core/models/interfaces/legacy-extras';
 import { CreateformbuilderService } from '../../../core/services/formbuilder/createformbuilder.service';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { QUICK_ADD_ARRAY_TOOLS, QuickAddTool, QuickAddType } from '../../../pages/templetes/canvas/config/quick-add-tools';
+import { FormGroupFactoryService } from '../../../core/services/formbuilder/form-group-factory.service';
+// import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-container-formarray',
@@ -21,6 +24,7 @@ import { QUICK_ADD_ARRAY_TOOLS, QuickAddTool, QuickAddType } from '../../../page
     CdkDragHandle,
     // Wrap RerenderComponent to break cyclic import with Rerender importing this container
     forwardRef(() => RerenderComponent),
+    FieldEditorMossdeComponent,
     DialogModule,
     InputTextModule,
     ButtonModule,
@@ -39,11 +43,14 @@ export class ContainerFormarrayComponent implements OnInit {
   private readonly _cc = inject(ControlContainer) as FormGroupDirective;
   array = input.required<FieldConfig>();
   // edit mode and parent form inputs to mirror root editing behavior
-  isEditMode = input<boolean>(false);
-  parentForm = input<FormGroup | null>(null);
+  @Input() arrayEditMode!: boolean;
+  @Output() arrayEditModeChange = new EventEmitter<boolean>();
+    parentForm = input<FormGroup | null>(null);
+  @Output() editRequested = new EventEmitter<FieldConfig>();
   private readonly _service = inject(CreateformbuilderService);
   private readonly _fb = inject(FormBuilder);
   private readonly _cdr = inject(ChangeDetectorRef);
+  private readonly _fgFactory = inject(FormGroupFactoryService);
 
   // Local state
   showAddDialog = signal(false);
@@ -52,18 +59,25 @@ export class ContainerFormarrayComponent implements OnInit {
     type: ['input-text', [Validators.required]],
   });
 
+  // Field edit dialog (per selected field) - use FieldEditorMossdeComponent
+  showFieldEditDialog = signal(false);
+  selectedTemplateField: FieldConfig | null = null;
+
   // Quick-add config (externalized)
   readonly QUICK_ADD_ARRAY_TOOLS = QUICK_ADD_ARRAY_TOOLS;
 
   ngOnInit(): void {
     // Ensure FormArray exists on parent form
-    const key = this.arrayKey();
-    if (key) {
-      const parent = this._cc.form;
-      const existing = parent.get(key);
-      if (!existing) {
-        parent.addControl(key, new FormArray([]));
-      }
+    let key = this.arrayKey();
+    const parent = (this.parentForm() as FormGroup) || (this._cc.form as FormGroup);
+    if (!key) {
+      // Generate a safe key if schema lacks one and store it on the array config
+      key = this.generateUniqueControlName('items');
+      (this.array() as any).formControl = key;
+    }
+    const existing = parent.get(key);
+    if (!existing) {
+      parent.addControl(key, new FormArray<FormGroup<any>>([]));
     }
 
     // Fallback for parentForm if not provided by parent
@@ -72,12 +86,19 @@ export class ContainerFormarrayComponent implements OnInit {
     }
   }
 
+  // Forward edit from nested renderer
+  onChildEdit(field: FieldConfig) {
+    // Open local edit dialog for this field inside array
+    if (!field) return;
+    this.openEditDialog(field);
+  }
+
   // Toolbar click handler to avoid casts in template
   onToolClick(tool: QuickAddTool): void {
     if (tool.openDialog) {
       this.openAddArrayDialog();
     } else {
-      this.addPreset(tool.type as QuickAddType);
+      this.addPreset(tool.type as any);
     }
   }
 
@@ -92,7 +113,7 @@ export class ContainerFormarrayComponent implements OnInit {
   arrayKey(): string {
     const a = this.array() as any;
     const byFormControl = typeof a.formControl === 'string' ? a.formControl : '';
-    return String(byFormControl || a.key || a.id || '');
+    return String(byFormControl || a.key || '');
   }
   arrayLabel(): string | null {
     const a = this.array() as any;
@@ -104,6 +125,95 @@ export class ContainerFormarrayComponent implements OnInit {
     const a = this.array() as any;
     const list = Array.isArray(a.children) ? a.children : [];
     return (list as FieldConfig[]) || [];
+  }
+
+  // Runtime FormArray accessor
+  get formArray(): FormArray<FormGroup<any>> | null {
+    const key = this.arrayKey();
+    if (!key) return null;
+    const ctrl = this.effectiveForm.get(key);
+    return ctrl instanceof FormArray ? (ctrl as FormArray<FormGroup<any>>) : null;
+  }
+
+  // For template typing: return only FormGroup controls
+  formArrayGroups(): FormGroup[] {
+    const fa = this.formArray;
+    if (!fa) return [];
+    return fa.controls.filter((c: any) => c instanceof FormGroup) as FormGroup[];
+  }
+
+  addItem(): void {
+    let key = this.arrayKey();
+    console.log('[ContainerFormarray] addItem() key=', key);
+    let fa = this.formArray;
+    console.log('[ContainerFormarray] existing FormArray?', !!fa, 'length=', fa?.length);
+    if (!fa) {
+      const parent = this.effectiveForm;
+      if (!key) {
+        key = this.generateUniqueControlName('items');
+        (this.array() as any).formControl = key;
+      }
+      const existing = parent.get(key);
+      if (existing instanceof FormArray) {
+        fa = existing as FormArray<FormGroup<any>>;
+      } else {
+        fa = new FormArray<FormGroup<any>>([]);
+        parent.addControl(key, fa);
+      }
+      console.log('[ContainerFormarray] created FormArray, length=', fa.length);
+    }
+    if (!fa) return;
+    const template = this.items();
+    const itemGroup = this._fgFactory.build({fields : template});
+    const before = fa.length;
+    fa.push(itemGroup);
+    console.log('[ContainerFormarray] pushed itemGroup. before=', before, 'after=', fa.length);
+    this._cdr.markForCheck();
+  }
+
+  removeItem(index: number): void {
+    const fa = this.formArray;
+    if (!fa) return;
+    if (index < 0 || index >= fa.length) return;
+    fa.removeAt(index);
+    this._cdr.markForCheck();
+  }
+
+  // (Search dialog removed): open editor directly from item actions
+
+  openEditDialog(field: FieldConfig): void {
+    this.selectedTemplateField = field;
+    this.showFieldEditDialog.set(true);
+  }
+
+  closeEditDialog(): void {
+    this.showFieldEditDialog.set(false);
+    this.selectedTemplateField = null;
+  }
+
+  onArrayFieldSaved(updatedField: FieldConfig): void {
+    if (!this.selectedTemplateField) return;
+    // Merge back into template children
+    const list = this.items();
+    const prevName = String(((this.selectedTemplateField as any).formControl || (this.selectedTemplateField as any).key || ''));
+    const idx = list.findIndex((f) => {
+      const name = String(((f as any).formControl || (f as any).key || ''));
+      return name === prevName;
+    });
+    if (idx !== -1) {
+      list[idx] = {
+        ...list[idx],
+        ...updatedField,
+        fieldStyle: { ...(list[idx] as any).fieldStyle, ...(updatedField as any).fieldStyle } as any,
+      } as any;
+      // Replace children to trigger CD
+      (this.array() as any).children = [...list];
+      this.selectedTemplateField = list[idx];
+      this._cdr.markForCheck();
+    }
+    this.closeEditDialog();
+    // Exit edit mode so runtime Add Item is available
+    this.arrayEditModeChange.emit(false);
   }
 
   // Provide a non-null FormGroup for template binding
@@ -152,7 +262,7 @@ export class ContainerFormarrayComponent implements OnInit {
     const isArray = type === 'array';
     const field: FieldConfig = (isArray
       ? {
-          id: `${type}-${Date.now()}-${Math.floor(Math.random()*1000)}`,
+          // id: uuidv4(),
           kind: 'array',
           key: controlName,
           formControl: nameRaw, // keep raw entered name to appear in JSON
@@ -162,7 +272,7 @@ export class ContainerFormarrayComponent implements OnInit {
           children: []
         }
       : {
-          id: `${type}-${Date.now()}-${Math.floor(Math.random()*1000)}`,
+          // id: uuidv4(),
           kind: 'control',
           key: controlName,
           formControl: controlName,
@@ -181,13 +291,13 @@ export class ContainerFormarrayComponent implements OnInit {
     this._cdr.markForCheck();
   }
 
-  addPreset(type: 'input-text' | 'textarea' | 'select' | 'checkbox' | 'imagefield' | 'array'): void {
+  addPreset(type: 'input-text' | 'textarea' | 'select' | 'checkbox' | 'imagefield' | 'array'| 'multi-select' ): void {
     const base = this.uniqueBaseFor(type);
     const name = this.generateUniqueControlName(base);
     const isArray = type === 'array';
     const field: FieldConfig = (isArray
       ? {
-          id: `${type}-${Date.now()}-${Math.floor(Math.random()*1000)}`,
+          // id: uuidv4(),
           kind: 'array',
           key: name,
           formControl: name,
@@ -197,7 +307,7 @@ export class ContainerFormarrayComponent implements OnInit {
           children: []
         }
       : {
-          id: `${type}-${Date.now()}-${Math.floor(Math.random()*1000)}`,
+          // id: uuidv4(),
           kind: 'control',
           key: name,
           formControl: name,
@@ -243,6 +353,8 @@ export class ContainerFormarrayComponent implements OnInit {
       case 'checkbox': return 'checkbox';
       case 'imagefield': return 'images';
       case 'array': return 'items';
+      case 'mullti-select': return 'multiselect'
+
       default: return 'control';
     }
   }
@@ -254,7 +366,11 @@ export class ContainerFormarrayComponent implements OnInit {
       case 'checkbox': return 'Checkbox';
       case 'imagefield': return 'Images';
       case 'array': return 'Array';
+      case 'mullti-select': return 'multiselect'
       default: return type;
     }
   }
+  // toggleEditMode() {
+  //   this.arrayEditMode = !this.arrayEditMode;
+  // }
 }

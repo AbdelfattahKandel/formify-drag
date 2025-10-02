@@ -4,7 +4,7 @@ import { FormGroup, ReactiveFormsModule, FormBuilder, Validators } from '@angula
 import { FieldConfig } from '../../../../../core/models/interfaces/legacy-extras';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 
 @Component({
   selector: 'app-field-properties',
@@ -14,7 +14,7 @@ import { DropdownModule } from 'primeng/dropdown';
     ReactiveFormsModule,
     InputTextModule,
     CheckboxModule,
-    DropdownModule
+    SelectModule
   ],
   template: `
     <div class="field-properties p-4 border-l border-gray-200 h-full">
@@ -50,8 +50,8 @@ import { DropdownModule } from 'primeng/dropdown';
               label="حقل مطلوب"
             ></p-checkbox>
           </div>
-          
-          <div class="field" *ngIf="showOptions()">
+          @if(showOptions()){
+          <div class="field" >
             <label class="block text-sm font-medium mb-1">الخيارات</label>
             <textarea 
               formControlName="options"
@@ -60,6 +60,7 @@ import { DropdownModule } from 'primeng/dropdown';
               class="w-full p-inputtextarea"
             ></textarea>
           </div>
+          }
           
           <div class="flex justify-end gap-2 mt-6">
             <button 

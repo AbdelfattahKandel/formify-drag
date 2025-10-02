@@ -21,7 +21,7 @@
   
   /* Canvas container */
   .canvas-container {
-    min-height: 80vh;
+    min-height: auto;
     padding: 1rem;
     border: none;
   }

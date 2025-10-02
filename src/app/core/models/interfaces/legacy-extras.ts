@@ -20,12 +20,23 @@ export type LegacyExtras = {
   disabled?: boolean;
   readonly?: boolean;
   required?: boolean;
+  
+  // Regex validation pattern (consumed by Validators.pattern)
+  pattern?: string;
   inputAttrs?: Record<string, string | number | boolean>;
   componentProps?: Record<string, any>;
   meta?: any;
   group?: string;
   tooltip?: string;
   hint?: string;
+  
+  // Button specific properties
+  action?: 'submit' | 'reset' | 'button' | string;
+  
+  // Style related properties
+  styles?: Record<string, any>;
+  css?: Record<string, any>;
+  
 };
 export interface FieldConfig extends LegacyExtras {
   kind: 'control' | 'group' | 'array';

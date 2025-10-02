@@ -119,28 +119,50 @@ export const PALETTE_TOOLS: FieldConfig[] = [
     options: [],
   },
 
-  // Image Field (uses FormArray of filenames + runtime previews)
+  // // Image Field (uses FormArray of filenames + runtime previews)
+  // {
+  //   id: 'imagefield-1',
+  //   formControl: 'images',
+  //   kind: 'control',
+  //   key: 'images',
+  //   type: 'imagefield' as any,
+  //   label: 'Images',
+  //   fieldStyle: { width: '100%' },
+  //   options: [],
+  // },
+  // {
+  //   id: 'imageInput-1',
+  //   formControl: 'image',
+  //   kind: 'control',
+  //   key: 'image',
+  //   type: 'image-input' as any,
+  //   label: 'Image Input',
+  //   fieldStyle: { width: '100%' },
+  //   options: [],
+  // },
+
+  // Attachment (single file name stored in a simple FormControl)
   {
-    id: 'imagefield-1',
-    formControl: 'images',
+    id: 'attachment-1',
+    formControl: 'attachment',
     kind: 'control',
-    key: 'images',
-    type: 'imagefield' as any,
-    label: 'Images',
+    key: 'attachment',
+    type: 'attachment' as any,
+    label: 'Attachment',
     fieldStyle: { width: '100%' },
     options: [],
   },
 
   // Containers
-  {
-    id: 'group-1',
-    kind: 'group',
-    key: 'group',
-    type: 'group' as any,
-    label: 'Group' ,
-    fieldStyle: { columns: 4, width: '100%' },
-    children: {}
-  },
+  // {
+  //   id: 'group-1',
+  //   kind: 'group',
+  //   key: 'group',
+  //   type: 'group' as any,
+  //   label: 'Group' ,
+  //   fieldStyle: { columns: 4, width: '100%' },
+  //   children: {}
+  // },
 
   // Array container
   {
@@ -178,6 +200,25 @@ export const PALETTE_TOOLS: FieldConfig[] = [
   //   fieldStyle: { width: '100%' } as any,
   //   options: [],
   // },
-
+{
+  id: 'submit-1',
+  kind: 'control',
+  key: 'submit',
+  type: 'submit' as any,
+  label: 'Submit',
+  action: 'submit',
+  fieldStyle: {
+    backgroundColor: '#22c55e',
+    padding: '0.5rem 1rem',
+    borderRadius: '2rem',
+    width: '100%',
+  },
+  styles: {
+    color: '#ffffff',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease-in-out',
+  },
+  options: []
+}
   
 ];

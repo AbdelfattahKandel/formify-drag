@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnInit, OnDestroy, inject, signal, effect, Injector } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, OnDestroy, inject, signal, effect, Injector, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { CdkDragDrop, moveItemInArray, CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
@@ -34,6 +34,7 @@ import { FormBuilderComponent as FormBuilderContainer } from './components/form-
 import { FormPreviewComponent } from './components/form-preview/form-preview.component';
 import { FieldPropertiesComponent } from './components/field-properties/field-properties.component';
 import { CreateformbuilderService } from '../../../core/services/formbuilder/createformbuilder.service';
+import { FormGroupFactoryService } from '../../../core/services/formbuilder/form-group-factory.service';
 import { exportSchema } from '../../../utils/export-schema';
 import { PALETTE_TOOLS } from './config/palette-tools';
 
@@ -90,11 +91,13 @@ export class CanvasComponent implements OnInit, OnDestroy {
   private readonly messageService = inject(MessageService);
   private readonly dialogService = inject(DialogService);
   private readonly formBuilderService = inject(CreateformbuilderService);
+  private readonly fgFactory = inject(FormGroupFactoryService);
   private readonly subs = new Subscription();
   private readonly injector = inject(Injector);
 
   // Form
   formGroup = this.fb.group({});
+  @ViewChild('importJsonInput') importJsonInput!: ElementRef<HTMLInputElement>;
   
   // State
   isPreviewMode = signal(false);
@@ -113,7 +116,7 @@ export class CanvasComponent implements OnInit, OnDestroy {
   }, { injector: this.injector });
   
   // Track by function for ngFor
-  trackByFn = (index: number, item: FieldConfig) => item.id || index;
+  trackByFn = (index: number, item: FieldConfig) => item.formControl || index;
 
   ngOnInit(): void {
     // Initialize form group
@@ -267,7 +270,7 @@ export class CanvasComponent implements OnInit, OnDestroy {
     }
     const keyBase = name.trim().replace(/\s+/g, '_').toLowerCase();
     const newGroup: FieldConfig = {
-      id: `group-${Date.now()}`,
+      // id: uuidv4(),
       kind: 'group',
       key: keyBase,
       label: name.trim(),
@@ -351,6 +354,76 @@ export class CanvasComponent implements OnInit, OnDestroy {
     }
   }
 
+  // ----- Import JSON -----
+  triggerImportJson() {
+    if (this.importJsonInput?.nativeElement) {
+      this.importJsonInput.nativeElement.value = '';
+      this.importJsonInput.nativeElement.click();
+    }
+  }
+
+  onImportJsonSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const text = String(reader.result || '');
+        const parsed = JSON.parse(text) as any;
+
+        // Prefer the exported "controls" shape
+        const controls = Array.isArray(parsed?.controls) ? parsed.controls : [];
+        const nextFields: FieldConfig[] = controls.map((c: any) => {
+          const data = c?.data || {};
+          const style = c?.style || {};
+          return {
+            // id:  uuidv4(),
+            kind: 'control' as any,
+            formControl: data.formControlName,
+            key: data.formControlName,
+            type: data.fieldType as any,
+            label: data.label,
+            placeholder: data.placeholder,
+            required: !!data.required,
+            disabled: !!data.disabled,
+            readonly: !!data.readonly,
+            options: data.options,
+            validators: data.validators,
+            value: data.value,
+            fieldStyle: style as any,
+            componentProps: data.componentProps,
+          } as any as FieldConfig;
+        });
+
+        // Fallback: if no controls, try legacy fields
+        const legacyFields: FieldConfig[] = Array.isArray(parsed?.fields) ? (parsed.fields as FieldConfig[]) : [];
+
+        if (nextFields.length > 0) {
+          this.droppedTools = [...nextFields];
+        } else if (legacyFields.length > 0) {
+          this.droppedTools = [...legacyFields];
+        } else {
+          this.messageService.add({ severity: 'warn', summary: 'Import', detail: 'No controls found in JSON.' });
+          return;
+        }
+
+        // Set title if provided
+        if (parsed?.formGroup && typeof parsed.formGroup === 'string') {
+          this.title = parsed.formGroup;
+        }
+
+        // Rebuild the reactive form
+        this.syncFormWithDroppedTools();
+        this.messageService.add({ severity: 'success', summary: 'Import', detail: 'Form imported successfully.' });
+      } catch (error) {
+        console.error('Error importing JSON:', error);
+        this.messageService.add({ severity: 'error', summary: 'Import Error', detail: 'Invalid JSON format.' });
+      }
+    };
+    reader.readAsText(file);
+  }
+
   openFieldEditor(field: FieldConfig) {
     if (!field) return;
     this.selectedField = field;
@@ -360,12 +433,25 @@ export class CanvasComponent implements OnInit, OnDestroy {
   onFieldSaved(updatedField: FieldConfig) {
     if (!this.selectedField) return;
     
-    const index = this.droppedTools.findIndex(f => f.id === this.selectedField?.id);
+    const index = this.droppedTools.findIndex(f => f.formControl === this.selectedField?.formControl);
     if (index !== -1) {
-      this.droppedTools[index] = { 
-        ...this.droppedTools[index], 
-        ...updatedField,
-        fieldStyle: { ...(this.droppedTools[index] as any).fieldStyle, ...(updatedField as any).fieldStyle } as any
+      const prev = this.droppedTools[index] as any;
+      const incoming: any = { ...updatedField };
+      // Preserve children for containers if editor didn't send them
+      if ((prev.kind === 'array' || prev.kind === 'group') && incoming.children == null) {
+        incoming.children = prev.children;
+      }
+      // Preserve/force container nature
+      if (prev.kind === 'array') {
+        incoming.kind = 'array';
+        incoming.type = 'array';
+      } else if (prev.kind === 'group') {
+        incoming.kind = 'group';
+      }
+      this.droppedTools[index] = {
+        ...prev,
+        ...incoming,
+        fieldStyle: { ...(prev.fieldStyle || {}), ...(incoming.fieldStyle || {}) } as any,
       } as any;
       this.droppedTools = [...this.droppedTools];
       this.selectedField = this.droppedTools[index];
@@ -384,7 +470,7 @@ export class CanvasComponent implements OnInit, OnDestroy {
   removeSelectedField() {
     if (!this.selectedField) return;
     
-    const index = this.droppedTools.findIndex(f => f.id === this.selectedField?.id);
+    const index = this.droppedTools.findIndex(f => f.formControl === this.selectedField?.formControl);
     if (index !== -1) {
       this.droppedTools.splice(index, 1);
       this.droppedTools = [...this.droppedTools];
@@ -396,7 +482,7 @@ export class CanvasComponent implements OnInit, OnDestroy {
     // Generate a unique ID for the field
     const fieldWithId = {
       ...field,
-      id: `field-${Date.now()}`,
+      // id: uuidv4(),
       formControl: field.formControl || `field${this.droppedTools.length + 1}`,
       // Ensure disabled is a boolean
       disabled: !!field.disabled
@@ -445,5 +531,42 @@ export class CanvasComponent implements OnInit, OnDestroy {
       default:
         return field.value ?? '';
     }
+  }
+
+  // ===== Array utilities (no nested arrays allowed) =====
+  isArrayField(field: FieldConfig): boolean {
+    return (field as any)?.kind === 'array' || (field as any)?.type === 'array';
+  }
+
+  private getArrayName(field: FieldConfig): string | null {
+    const name = (field as any).formControl || (field as any).key;
+    return typeof name === 'string' && name ? name : null;
+  }
+
+  getArrayControls(field: FieldConfig) {
+    const name = this.getArrayName(field);
+    if (!name) return [];
+    const fa = this.formGroup.get(name);
+    return (fa && (fa as any).controls) ? (fa as any).controls : [];
+  }
+
+  addArrayItem(field: FieldConfig) {
+    const name = this.getArrayName(field);
+    if (!name) return;
+    const fa = this.formGroup.get(name) as any;
+    if (!fa || typeof fa.push !== 'function') return;
+    const rawChildren: any = (field as any).children;
+    const template: FieldConfig[] = Array.isArray(rawChildren) ? rawChildren as FieldConfig[] : [];
+    const itemGroup = this.fgFactory.build({ fields: template } as FormSchema);
+    fa.push(itemGroup);
+  }
+
+  removeArrayItem(field: FieldConfig, index: number) {
+    const name = this.getArrayName(field);
+    if (!name) return;
+    const fa = this.formGroup.get(name) as any;
+    if (!fa || typeof fa.removeAt !== 'function') return;
+    if (index < 0 || index >= fa.length) return;
+    fa.removeAt(index);
   }
 }

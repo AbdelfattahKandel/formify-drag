@@ -1,5 +1,5 @@
 export type ValidatorConfig =
-  | { name: 'required' }
+  | { name: 'required'; }
   | { name: 'min'; args: number }
   | { name: 'max'; args: number }
   | { name: 'minLength'; args: number }

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, inject, signal, ChangeDetectorRef, forwardRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, ControlContainer, FormGroupDirective, FormGroupName, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, ControlContainer, FormGroupDirective, FormGroupName, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FieldConfig } from '../../../core/models/interfaces/legacy-extras';
 import { CdkDropList, CdkDragDrop, moveItemInArray, CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { CreateformbuilderService } from '../../../core/services/formbuilder/createformbuilder.service';
@@ -37,6 +37,9 @@ import { ButtonModule } from 'primeng/button';
 })
 export class ContainerFormgroupComponent implements OnInit {
   group = input.required<FieldConfig>();
+  // propagate edit mode and parent form from renderer
+  isEditMode = input<boolean>(false);
+  parentForm = input<FormGroup | null>(null);
   private readonly formBuilderService = inject(CreateformbuilderService);
   private _fb = inject(FormBuilder);
   private _cdr = inject(ChangeDetectorRef);
@@ -57,6 +60,14 @@ export class ContainerFormgroupComponent implements OnInit {
   groupLabel(): string | null {
     const g = this.group() as any;
     return (g.label as string) || null;
+  }
+
+  // Expose the effective nested FormGroup for children editing
+  get effectiveForm(): FormGroup | null {
+    const key = this.groupKey();
+    const pf = this.parentForm();
+    const direct = pf?.get(key) as FormGroup | null;
+    return direct || (this._cc.form.get(key) as FormGroup | null);
   }
 
   ngOnInit(): void {
