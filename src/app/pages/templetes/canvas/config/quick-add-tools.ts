@@ -1,6 +1,19 @@
 import { FieldConfig } from '../../../../core/models/interfaces/legacy-extras';
 
-export type QuickAddType = 'input-text' | 'textarea' | 'select' | 'multi-select' | 'radio' | 'checkbox' | 'imagefield' | 'array' | 'datepicker' |  'input-number' | 'password' | 'group' ;
+export type QuickAddType =
+  | 'input-text'
+  | 'textarea'
+  | 'select'
+  | 'multi-select'
+  | 'radio'
+  | 'checkbox'
+  | 'attachment'
+  | 'imagefield'
+  | 'array'
+  | 'datepicker'
+  | 'input-number'
+  | 'password'
+  | 'group';
 
 export interface QuickAddTool {
   type: QuickAddType;
@@ -30,10 +43,10 @@ export const QUICK_ADD_ARRAY_TOOLS: QuickAddTool[] = [
   { type: 'password', label: 'Password', styleClass: 'p-button-sm p-button-secondary' },
   { type: 'textarea', label: 'Textarea', styleClass: 'p-button-sm p-button-secondary' },
   { type: 'select', label: 'Select', styleClass: 'p-button-sm p-button-secondary' },
-  { type: 'radio', label: 'radio', styleClass: 'p-button-sm p-button-secondary' },
   { type: 'multi-select', label: 'Multiselect', styleClass: 'p-button-sm p-button-secondary' },
+  { type: 'radio', label: 'radio', styleClass: 'p-button-sm p-button-secondary' },
   { type: 'datepicker', label: 'Datepicker', styleClass: 'p-button-sm p-button-secondary' },
   { type: 'input-number', label: 'Number', styleClass: 'p-button-sm p-button-secondary' },
   { type: 'checkbox', label: 'Checkbox', styleClass: 'p-button-sm p-button-secondary' },
-  // { type: 'imagefield', label: 'Images', styleClass: 'p-button-sm p-button-secondary' },
+  { type: 'attachment', label: 'Attachment', styleClass: 'p-button-sm p-button-secondary' },
 ];

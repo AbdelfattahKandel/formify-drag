@@ -30,22 +30,16 @@ import { AddFormDialogComponent } from '../../../../../shared/components/add-for
 })
 export class UnifiedSidebarComponent {
   // Inputs
-  pages = input.required<PageConfig[]>();
-  currentPageName = input.required<string>();
   groupNames = input.required<string[]>();
   selectedGroup = input.required<string>();
   paletteTools = input.required<FieldConfig[]>();
 
   // Outputs
-  pageSwitch = output<string>();
-  pageAdd = output<void>();
-  pageRemove = output<string>();
   groupSelect = output<string>();
   groupAdd = output<string>(); // Changed: now emits the group name directly
   groupRemove = output<string>();
 
   // Memoized computed values for performance
-  pagesCount = computed(() => this.pages().length);
   groupsCount = computed(() => this.groupNames().length);
   controlsCount = computed(() => this.paletteTools().length);
   
@@ -55,23 +49,7 @@ export class UnifiedSidebarComponent {
   // Add form dialog
   showAddFormDialog = signal(false);
 
-  // Pages methods
-  onSelectPage(pageName: string): void {
-    this.pageSwitch.emit(pageName);
-  }
 
-  onAddPage(): void {
-    this.pageAdd.emit();
-  }
-
-  onRemovePage(pageName: string, event: Event): void {
-    event.stopPropagation();
-    this.pageRemove.emit(pageName);
-  }
-
-  isPageSelected(pageName: string): boolean {
-    return this.currentPageName() === pageName;
-  }
 
   // Groups methods
   onSelectGroup(groupName: string): void {

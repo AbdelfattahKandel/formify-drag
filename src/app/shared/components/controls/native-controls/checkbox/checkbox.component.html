@@ -1,0 +1,36 @@
+<div class="flex flex-col gap-1">
+  <div class="flex items-center gap-2">
+    @if (formControlInst()) {
+      <input
+        type="checkbox"
+        class="h-4 w-4 rounded border border-slate-300 text-blue-600 focus:ring-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2"
+        [formControl]="formControlInst()!"
+        [id]="controlId()"
+        [attr.name]="controlName() ?? controlId()"
+      />
+    } @else if (controlName()) {
+      <input
+        type="checkbox"
+        class="h-4 w-4 rounded border border-slate-300 text-blue-600 focus:ring-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2"
+        [formControlName]="controlName()!"
+        [id]="controlId()"
+        [attr.name]="controlName()"
+      />
+    } @else {
+      <input
+        type="checkbox"
+        class="h-4 w-4 rounded border border-slate-300 text-blue-600 focus:ring-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        [checked]="!!field().value"
+        [id]="controlId()"
+      />
+    }
+
+    @if (field().label) {
+      <label class="text-sm text-slate-700" [for]="controlId()">{{ field().label }}</label>
+    }
+  </div>
+
+  @if (field().hint) {
+    <small class="ml-6 text-xs text-slate-500">{{ field().hint }}</small>
+  }
+</div>

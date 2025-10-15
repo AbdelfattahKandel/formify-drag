@@ -1,0 +1,81 @@
+<div
+  #rootRef
+  data-native-multiselect-root
+  class="relative flex flex-col gap-1"
+>
+  @if (field().label) {
+    <label class="text-sm font-medium text-slate-700" [for]="controlId()">{{ field().label }}</label>
+  }
+
+  <button
+    type="button"
+    class="flex w-full items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-700 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+    [class.opacity-60]="isDisabled()"
+    [disabled]="isDisabled()"
+    [attr.aria-expanded]="isPanelOpen()"
+    [attr.aria-controls]="controlId() + '_panel'"
+    (click)="togglePanel()"
+  >
+    <div class="flex flex-wrap items-center gap-2">
+      @if (selectedValues().length) {
+        @for (value of selectedValues(); track value) {
+          <span class="flex items-center gap-1 rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-700">
+            {{ displayLabel(value) }}
+            <button
+              type="button"
+              class="text-blue-600 hover:text-blue-800 focus:outline-none"
+              (click)="removeChip(value, $event)"
+            >
+              ×
+            </button>
+          </span>
+        }
+      } @else {
+        <span class="text-xs text-slate-400">{{ placeholder() || 'Select options' }}</span>
+      }
+    </div>
+    <i class="fa-solid fa-chevron-down text-slate-400"></i>
+  </button>
+
+  @if (isPanelOpen()) {
+    <div
+      [id]="controlId() + '_panel'"
+      class="absolute z-50 mt-1 w-full overflow-hidden rounded-md border border-slate-200 bg-white shadow-lg"
+    >
+      <div class="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+        <span>{{ selectedValues().length }} selected</span>
+        <button
+          type="button"
+          class="text-blue-600 hover:text-blue-800 focus:outline-none"
+          (click)="clearSelection()"
+        >
+          Clear
+        </button>
+      </div>
+      <div class="max-h-60 overflow-auto p-1">
+        @if (options().length) {
+          @for (option of options(); track trackByValue($index, option)) {
+            <button
+              type="button"
+              (click)="selectOption(option)"
+              class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
+              [class.bg-blue-100]="isSelected(option.value)"
+              [class.text-blue-700]="isSelected(option.value)"
+            >
+              <span>{{ option.label }}</span>
+              @if (isSelected(option.value)) {
+                <i class="fa-solid fa-check text-blue-600"></i>
+              }
+            </button>
+          }
+        } @else {
+          <p class="px-3 py-2 text-xs text-slate-400">No options available</p>
+        }
+      </div>
+    </div>
+  }
+
+  @if (field().hint) {
+    <small class="text-xs text-slate-500">{{ field().hint }}</small>
+  }
+</div>

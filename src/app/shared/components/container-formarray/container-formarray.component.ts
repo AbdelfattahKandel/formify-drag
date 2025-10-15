@@ -292,18 +292,12 @@ export class ContainerFormarrayComponent implements OnInit {
           fieldStyle: { columns: 4, width: '100%' } as any,
           children: []
         }
-      : {
-          kind: 'control',
+      : this.buildControlPreset({
           key: controlName,
           formControl: controlName,
           type,
           label: nameRaw,
-          fieldStyle: { columns: 2, width: '100%' } as any,
-          options: type === 'select' ? [
-            { label: 'Option 1', value: 'option1' },
-            { label: 'Option 2', value: 'option2' },
-          ] : []
-        }
+        })
     ) as any;
     const copied = this._service.createCopiedField(field as any);
     this._service.addItemToArray(this.array(), copied);
@@ -312,7 +306,7 @@ export class ContainerFormarrayComponent implements OnInit {
     this._cdr.markForCheck();
   }
 
-  addPreset(type: 'input-text' | 'textarea' | 'select' | 'checkbox' | 'imagefield' | 'array'| 'multi-select' ): void {
+  addPreset(type: 'input-text' | 'textarea' | 'select' | 'checkbox' | 'imagefield' | 'array' | 'multi-select' | 'password' | 'datepicker' | 'input-number' | 'attachment'): void {
     console.log('✅ [FormArray] تم إضافة عنصر جوا الـ Array من Preset:', type);
     const base = this.uniqueBaseFor(type);
     const name = this.generateUniqueControlName(base);
@@ -327,18 +321,12 @@ export class ContainerFormarrayComponent implements OnInit {
           fieldStyle: { columns: 4, width: '100%' } as any,
           children: []
         }
-      : {
-          kind: 'control',
+      : this.buildControlPreset({
           key: name,
           formControl: name,
           type,
           label: this.labelFor(type),
-          fieldStyle: { columns: 2, width: '100%' } as any,
-          options: type === 'select' ? [
-            { label: 'Option 1', value: 'option1' },
-            { label: 'Option 2', value: 'option2' },
-          ] : []
-        }
+        })
     ) as any;
     const copied = this._service.createCopiedField(field as any);
     this._service.addItemToArray(this.array(), copied);
@@ -368,26 +356,98 @@ export class ContainerFormarrayComponent implements OnInit {
   }
   private uniqueBaseFor(type: string): string {
     switch (type) {
-      case 'input-text': return 'text';
-      case 'textarea': return 'textarea';
-      case 'select': return 'select';
-      case 'checkbox': return 'checkbox';
-      case 'imagefield': return 'images';
-      case 'array': return 'items';
-      case 'multi-select': return 'multiselect';
-      default: return 'control';
+      case 'input-text':
+        return 'text';
+      case 'textarea':
+        return 'textarea';
+      case 'select':
+        return 'select';
+      case 'multi-select':
+        return 'multiselect';
+      case 'radio':
+        return 'radio';
+      case 'checkbox':
+        return 'checkbox';
+      case 'attachment':
+        return 'attachment';
+      case 'datepicker':
+        return 'date';
+      case 'input-number':
+        return 'number';
+      case 'password':
+        return 'password';
+      case 'imagefield':
+        return 'images';
+      case 'array':
+        return 'items';
+      default:
+        return 'control';
     }
   }
   private labelFor(type: string): string {
     switch (type) {
-      case 'input-text': return 'Text Input';
-      case 'textarea': return 'Textarea';
-      case 'select': return 'Select';
-      case 'checkbox': return 'Checkbox';
-      case 'imagefield': return 'Images';
-      case 'array': return 'Array';
-      case 'multi-select': return 'Multi Select';
-      default: return type;
+      case 'input-text':
+        return 'Text Input';
+      case 'password':
+        return 'Password';
+      case 'textarea':
+        return 'Textarea';
+      case 'select':
+        return 'Select';
+      case 'multi-select':
+        return 'Multi Select';
+      case 'radio':
+        return 'Radio';
+      case 'checkbox':
+        return 'Checkbox';
+      case 'attachment':
+        return 'Attachment';
+      case 'datepicker':
+        return 'Date';
+      case 'input-number':
+        return 'Number';
+      case 'imagefield':
+        return 'Images';
+      case 'array':
+        return 'Array';
+      default:
+        return type;
+    }
+  }
+
+  private buildControlPreset({ key, formControl, type, label }: { key: string; formControl: string; type: string; label: string }): FieldConfig {
+    const baseField: FieldConfig = {
+      kind: 'control',
+      key,
+      formControl,
+      type,
+      label,
+      fieldStyle: { columns: 2, width: '100%' } as any,
+    } as FieldConfig;
+
+    switch (type) {
+      case 'select':
+      case 'multi-select':
+        return {
+          ...baseField,
+          options: [
+            { label: 'Option 1', value: 'option1' },
+            { label: 'Option 2', value: 'option2' },
+          ],
+        } as FieldConfig;
+      case 'attachment':
+        return {
+          ...baseField,
+          componentProps: {
+            description: 'Upload files',
+            uploadUrl: '/api/upload',
+          },
+        } as FieldConfig;
+      default:
+        return {
+          ...baseField,
+          options: [],
+        } as FieldConfig;
     }
   }
 }

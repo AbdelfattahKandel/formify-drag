@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { FormSchema } from '../../models/interfaces/form-schema';
 import { FieldConfig } from '../../models/interfaces/legacy-extras';
 import { exportSchema } from '../../../utils/export-schema';
@@ -7,9 +7,12 @@ import { sanitizeFieldName } from '../../../utils/sanitize-field-name';
 import { ContainerStyle } from '../../models/interfaces/container-style';
 import { PageConfig } from '../../models/interfaces/page-config';
 import { MultiPageExportFormat } from '../../models/interfaces/multi-page-schema';
+import { BuilderPreferencesService } from '../builder-preferences.service';
 
 @Injectable({ providedIn: 'root' })
 export class SchemaSerializerService {
+
+  private readonly _prefs = inject(BuilderPreferencesService);
 
   export(schema: FormSchema): string {
     return exportSchema(schema);
@@ -167,16 +170,22 @@ export class SchemaSerializerService {
     
     pages.forEach((page) => {
       Object.entries(page.groups).forEach(([groupName, groupConfig]) => {
-        formsObject[groupName] = groupConfig.forms.map((form) => ({
-          id: form.id,
-          formGroup: form.formGroup || `${groupName}_group`,
-          containerStyle: form.containerStyle || this.getContainerStyle(),
-          controls: form.controls || [],
-        }));
+        formsObject[groupName] = groupConfig.forms.map((form) => {
+          const transformedContainer = this.transformContainerStyle(form.containerStyle);
+          const transformedControls = (form.controls || []).map((control) => this.transformControl(control));
+          
+          return {
+            id: form.id,
+            formGroup: form.formGroup || `${groupName}_group`,
+            ...transformedContainer,
+            controls: transformedControls,
+          };
+        });
       });
     });
     
     return {
+      styleFramework: this._prefs.styleChoice() || 'tailwind',
       forms: formsObject
     };
   }
@@ -199,6 +208,11 @@ export class SchemaSerializerService {
       // New structure: { forms: { groupName: [...forms] } }
       if (!parsed.forms || typeof parsed.forms !== 'object') {
         throw new Error('Invalid schema: "forms" object is required');
+      }
+
+      // Restore style framework preference if present
+      if (parsed.styleFramework && ['tailwind', 'bootstrap', 'native'].includes(parsed.styleFramework)) {
+        this._prefs.setStyleChoice(parsed.styleFramework);
       }
 
       // Create a single default page containing all groups
@@ -243,6 +257,7 @@ export class SchemaSerializerService {
     return controls.map((control: any) => {
       const data = control.data || {};
       const style = control.style || {};
+      const classStr = control.class;
       
       return {
         id: data.formControlName || `field_${Math.random().toString(36).substr(2, 9)}`,
@@ -260,6 +275,7 @@ export class SchemaSerializerService {
         options: data.options,
         validators: data.validators,
         fieldStyle: style,
+        cssClasses: classStr || data.cssClasses,
         uiConfig: data.uiConfig,
         validations: data.validations,
         computed: data.computed,
@@ -267,7 +283,6 @@ export class SchemaSerializerService {
         dataSourceConfig: data.dataSourceConfig,
         permissions: data.permissions,
         events: data.events,
-        cssClasses: data.cssClasses,
       } as any;
     });
   }
@@ -283,5 +298,114 @@ export class SchemaSerializerService {
     } catch {
       return false;
     }
+  }
+
+  /**
+   * Transform container style based on selected framework
+   */
+  private transformContainerStyle(style: ContainerStyle | undefined): any {
+    if (!style) {
+      style = this.getContainerStyle();
+    }
+
+    const framework = this._prefs.styleChoice();
+
+    if (framework === 'native') {
+      // Return inline CSS object
+      return style;
+    }
+
+    // Convert to class string for tailwind/bootstrap
+    if (framework === 'tailwind') {
+      return { containerClass: this.toTailwindContainerClasses(style) };
+    }
+
+    if (framework === 'bootstrap') {
+      return { containerClass: this.toBootstrapContainerClasses(style) };
+    }
+
+    return style;
+  }
+
+  /**
+   * Transform control style/class based on framework
+   */
+  private transformControl(control: any): any {
+    const framework = this._prefs.styleChoice();
+
+    if (framework === 'native') {
+      return {
+        data: control.data,
+        style: control.style
+      };
+    }
+
+    return {
+      data: control.data,
+      class: this.convertFieldStyleToClass(control.style, framework as 'tailwind' | 'bootstrap')
+    };
+  }
+
+  /**
+   * Convert field style object to utility class string
+   */
+  private convertFieldStyleToClass(style: any, framework: 'tailwind' | 'bootstrap'): string {
+    if (!style) {
+      return framework === 'tailwind' ? 'col-span-2 w-full' : 'col-md-6';
+    }
+
+    const columns = style.columns || 2;
+
+    if (framework === 'tailwind') {
+      return `col-span-${columns} w-full`;
+    }
+
+    // Bootstrap: 4 columns = 12-col grid
+    const bsCols = Math.round((columns / 4) * 12);
+    return `col-md-${bsCols}`;
+  }
+
+  /**
+   * Convert ContainerStyle to Tailwind utility classes
+   */
+  private toTailwindContainerClasses(style: ContainerStyle): string {
+    const classes: string[] = [];
+
+    // Add base classes from cssClass, but filter out 'grid' to avoid duplication
+    if (style.cssClass) {
+      const baseClasses = style.cssClass.split(' ').filter(c => c !== 'grid');
+      classes.push(...baseClasses);
+    }
+    
+    // Add grid layout
+    classes.push(`grid grid-cols-${style.columns || 4}`);
+    
+    if (style.gap) classes.push(`gap-${style.gap.replace('rem', '')}`);
+    if (style.padding) classes.push(`p-${style.padding.replace('rem', '')}`);
+    if (style.backgroundColor === '#ffffff') classes.push('bg-white');
+    if (style.border) classes.push('border border-slate-200');
+    if (style.borderRadius) classes.push('rounded-lg');
+    if (style.boxShadow) classes.push('shadow-sm');
+    if (style.maxWidth) classes.push('max-w-7xl');
+    if (style.margin === '0 auto') classes.push('mx-auto');
+
+    return classes.join(' ');
+  }
+
+  /**
+   * Convert ContainerStyle to Bootstrap utility classes
+   */
+  private toBootstrapContainerClasses(style: ContainerStyle): string {
+    const classes: string[] = [];
+
+    if (style.cssClass) classes.push(style.cssClass);
+    classes.push('container-fluid row');
+    if (style.gap) classes.push(`g-${Math.round(parseFloat(style.gap) * 4)}`);
+    if (style.padding) classes.push(`p-${Math.round(parseFloat(style.padding) * 2)}`);
+    if (style.backgroundColor === '#ffffff') classes.push('bg-white');
+    if (style.border) classes.push('border rounded');
+    if (style.boxShadow) classes.push('shadow-sm');
+
+    return classes.join(' ');
   }
 }

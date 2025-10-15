@@ -2,42 +2,99 @@
   (click)="!isDragging && onFieldClick($event)" (mousedown)="onMouseDown($event)" (mouseup)="onMouseUp()"
   (mouseleave)="onMouseLeave()" [formGroup]="formGroup">
   @switch(getType()) {
-    <!-- FieldType canonical names -->
-    @case('input-text') { <app-inputtext [field]="field"></app-inputtext> }
-    @case('password') { <app-password [field]="field"></app-password> }
-    @case('input-number') { <app-inputnumber [field]="field"></app-inputnumber> }
-    @case('textarea') { <app-textarea [field]="field"></app-textarea> }
-    @case('colorpicker') { <app-colorpicker [field]="field"></app-colorpicker> }
-    @case('datepicker') { <app-datepicker [field]="field"></app-datepicker> }
-    @case('select') { <app-select [field]="field"></app-select> }
-    @case('multi-select') { <app-multiselect [field]="field"></app-multiselect> }
-    @case('checkbox') { <app-checkbox [field]="field"></app-checkbox> }
-    @case('radio') { <app-radiobutton [field]="field"></app-radiobutton> }
-    @case('select-button') { <app-selectbutton></app-selectbutton> }
-    @case('toggle-button') { <app-togglebutton></app-togglebutton> }
-    @case('toggle-switch') { <app-toggleswitch></app-toggleswitch> }
-    <!-- @case('group') { <app-container-formgroup [group]="field" [isEditMode]="isEditMode" [parentForm]="formGroup"></app-container-formgroup> } -->
-    @case('array') { <app-container-formarray [array]="field" [(arrayEditMode)]="arrayEditMode" [parentForm]="formGroup"></app-container-formarray> }
+    @case('input-text') {
+      @if (isNativeLibrary()) {
+        <app-native-inputtext [field]="field"></app-native-inputtext>
+      } @else {
+        <app-inputtext [field]="field"></app-inputtext>
+      }
+    }
+    @case('password') {
+      @if(isNativeLibrary()){
+        <app-native-password [field]="field"></app-native-password>
+      }@else{
+       <app-password [field]="field"></app-password> }
+    }
+    @case('input-number') { 
+      @if(isNativeLibrary()){
+        <app-native-inputnumber [field]="field"></app-native-inputnumber>
+      }
+      @else {
+        <app-inputnumber [field]="field"></app-inputnumber> }
+      }
+    @case('textarea') { 
+      @if(isNativeLibrary()){
+        <app-native-textarea [field]="field"></app-native-textarea>
 
-    <!-- @case('imagefield') {
-      <app-imagefield
-        [field]="field"
-        [imagesInput]="getFormArray(field)"
-        [uploadUrl]="'http://10.4.30.8:7093/api/UploadStaticFile'"
-        [fileFieldName]="'File'"
-        [uploadFolder]="'any Folder'">
-      </app-imagefield>
-    } -->
-      @case ('image-input') { <app-image-input [field]="field"></app-image-input> }
-    @case('attachment') { <app-attachment [field]="field"></app-attachment> }
+      }@else {
+
+        <app-textarea [field]="field"></app-textarea> }
+      }
+    @case('datepicker') { 
+      @if (isNativeLibrary()) {
+        <app-native-datepicker [field]="field"></app-native-datepicker>
+
+      }@else {
+
+        <app-datepicker [field]="field"></app-datepicker> }
+      }
+    @case('select') { 
+      @if (isNativeLibrary()) {
+        <app-native-select [field]="field"></app-native-select>
+
+      }@else {
+
+        <app-select [field]="field"></app-select> }
+      }
+    @case('multi-select') { 
+      @if (isNativeLibrary()) {
+        <app-native-multiselect [field]="field"></app-native-multiselect>
+
+      }@else {
+
+        <app-multiselect [field]="field"></app-multiselect> }
+      }
+    @case('checkbox') { 
+      @if (isNativeLibrary()) {
+        <app-native-checkbox [field]="field"></app-native-checkbox>
+
+      }@else {
+
+        <app-checkbox [field]="field"></app-checkbox> }
+      }
+    @case('radio') { 
+      @if (isNativeLibrary()) {
+        <app-native-radiobutton [field]="field"></app-native-radiobutton>
+
+      }@else {
+
+        <app-radiobutton [field]="field"></app-radiobutton> }
+      }
+
+    @case('array') { 
+      @if (isNativeLibrary()) {
+        <app-container-formarray [array]="field" [(arrayEditMode)]="arrayEditMode" [parentForm]="formGroup"></app-container-formarray>
+      }@else {
+
+        <app-container-formarray [array]="field" [(arrayEditMode)]="arrayEditMode" [parentForm]="formGroup"></app-container-formarray> }
+      }
+    @case ('image-input') { 
+      @if (isNativeLibrary()) {
+
+      }@else {
+
+        <app-image-input [field]="field"></app-image-input> }
+      }
+    @case('attachment') { 
+      @if (isNativeLibrary()) {
+        <app-native-attachment [field]="field"></app-native-attachment>
+
+      }@else {
+
+        <app-attachment [field]="field"></app-attachment> }
+      }
     @case('submit') { <button class="bg-green-500 text-white px-4 py-2 rounded-4xl hover:bg-green-600 hover:text-white transition-all duration-300 ease-in-out cursor-pointer w-full" (click)="onSubmit()">{{field.label}}</button>}
     @case('button') { <button class="bg-green-500 text-white px-4 py-2 rounded-4xl hover:bg-green-600 hover:text-white transition-all duration-300 ease-in-out cursor-pointer w-full" (click)="onSubmit()">{{field.label || 'Button'}}</button>}
-    
-
-    
-    
-    
-
     @default {
       <span class="text-red-500">Unsupported field: {{ getType() || field.kind }}</span>
     }

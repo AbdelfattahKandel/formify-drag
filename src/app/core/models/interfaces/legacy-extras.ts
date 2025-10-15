@@ -10,7 +10,7 @@ export type LegacyExtras = {
   label?: string | null;
   placeholder?: string;
   fieldStyle?: FieldStyle;
-  type?: FieldType; // legacy alias
+  type?: FieldType;
   fieldType?: FieldType;
   value?: any;
   validators?: ValidatorConfig[];

@@ -43,6 +43,10 @@
 
 <main class="grid grid-cols-4 w-[99vw] h-[calc(99vh-5rem)] mx-auto">
   <section class="col-span-4 border-l border-gray-200 p-4 space-y-4">
-    <app-canvas #canvasRef></app-canvas>
+    <app-canvas
+      #canvasRef
+      [paletteToolsInput]="tools()"
+      [uiLibraryPreference]="uiChoice()"
+    ></app-canvas>
   </section>
 </main>

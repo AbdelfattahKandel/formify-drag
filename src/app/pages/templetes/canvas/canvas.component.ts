@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnInit, OnDestroy, inject, signal, effect, Injector, ViewChild, ElementRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, OnDestroy, inject, signal, effect, Injector, ViewChild, ElementRef, input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { CdkDragDrop, moveItemInArray, CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
@@ -12,11 +12,11 @@ import { JsonViewerComponent } from '../../../shared/components/json-viewer/json
 
 import { FieldEditorMossdeComponent } from '../../../shared/components/field-editor-mode/field-editor-mode.component';
 import { UnifiedSidebarComponent } from './components/unified-sidebar/unified-sidebar.component';
-import { ExportOptionsDialogComponent, ExportOptions } from '../../../shared/components/export-options-dialog/export-options-dialog.component';
 
 // Models
 import { FieldConfig } from '../../../core/models/interfaces/legacy-extras';
 import { FormSchema } from '../../../core/models/interfaces/form-schema';
+import { UiLibraryPreference } from '../../../core/models/builder-preferences';
 
 
 // PrimeNG Modules
@@ -37,7 +37,8 @@ import { PageManagementService } from '../../../core/services/page-management.se
 import { GroupManagementService } from '../../../core/services/group-management.service';
 import { SchemaSerializerService } from '../../../core/services/formbuilder/schema-serializer.service';
 import { isMultiPageFormat } from '../../../utils/import-multi-page-schema';
-import { PALETTE_TOOLS } from './config/palette-tools';
+import { toolsMap } from '../../nodelayout/tools/tools-map';
+import { BuilderPreferencesService } from '../../../core/services/builder-preferences.service';
 
 @Component({
   selector: 'app-canvas',
@@ -84,8 +85,12 @@ export class CanvasComponent implements OnInit, OnDestroy {
   private readonly pageManagementService = inject(PageManagementService);
   private readonly groupManagementService = inject(GroupManagementService);
   private readonly schemaSerializer = inject(SchemaSerializerService);
+  private readonly builderPrefs = inject(BuilderPreferencesService);
   private readonly subs = new Subscription();
   private readonly injector = inject(Injector);
+
+  paletteToolsInput = input<FieldConfig[]>();
+  uiLibraryPreference = input<UiLibraryPreference | null>();
 
   // Form
   formGroup = this.fb.group({});
@@ -103,7 +108,18 @@ export class CanvasComponent implements OnInit, OnDestroy {
   currentGroupNames = signal<string[]>([]);
   
   // Toolbox items (externalized)
-  paletteTools: FieldConfig[] = PALETTE_TOOLS;
+  private readonly paletteToolsComputed = computed(() => {
+    const input = this.paletteToolsInput();
+    if (input) return input;
+    
+    // Fallback to user preference or default to primeng
+    const pref = this.builderPrefs.uiChoice();
+    return pref ? toolsMap[pref] : toolsMap['primeng'];
+  });
+
+  get paletteTools(): FieldConfig[] {
+    return this.paletteToolsComputed();
+  }
 
   // Fields
   fields = signal<FieldConfig[]>([]);
@@ -203,11 +219,20 @@ export class CanvasComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.selectedGroup()) {
+      this.saveCurrentFormControls();
+    }
+
     const pageName = this.currentPage();
-    const success = this.groupManagementService.addGroup(pageName, groupName.trim());
+    const trimmedGroupName = groupName.trim();
+    const success = this.groupManagementService.addGroup(pageName, trimmedGroupName);
     if (success) {
       this.updateCurrentGroupNames();
-      this.selectedGroup.set(groupName.trim());
+      this.selectedGroup.set(trimmedGroupName);
+      const key = this.getCurrentFormKey();
+      this.formControlsMap.set(key, []);
+      this.droppedTools = [];
+      this.syncFormWithDroppedTools();
       this.messageService.add({ severity: 'success', summary: 'Success', detail: `Form "${groupName}" added.` });
     } else {
       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to add form.' });

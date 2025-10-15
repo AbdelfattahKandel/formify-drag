@@ -1,5 +1,5 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, SimpleChanges, forwardRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, SimpleChanges, forwardRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormArray, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { FieldConfig } from '../../../core/models/interfaces/legacy-extras';
@@ -7,7 +7,6 @@ import { CreateformbuilderService } from '../../../core/services/formbuilder/cre
 
 // PrimeNG Control Components
 import { CheckboxComponent } from '../../../shared/components/controls/primeng-controls/checkbox/checkbox.component';
-import { ColorpickerComponent } from '../../../shared/components/controls/primeng-controls/colorpicker/colorpicker.component';
 import { DatepickerComponent } from '../../../shared/components/controls/primeng-controls/datepicker/datepicker.component';
 import { InputnumberComponent } from '../../../shared/components/controls/primeng-controls/inputnumber/inputnumber.component';
 import { InputtextComponent } from '../../../shared/components/controls/primeng-controls/inputtext/inputtext.component';
@@ -15,21 +14,21 @@ import { MultiselectComponent } from '../../../shared/components/controls/primen
 import { PasswordComponent } from '../../../shared/components/controls/primeng-controls/password/password.component';
 import { RadiobuttonComponent } from '../../../shared/components/controls/primeng-controls/radiobutton/radiobutton.component';
 import { SelectComponent } from '../../../shared/components/controls/primeng-controls/select/select.component';
-import { SelectbuttonComponent } from '../../../shared/components/controls/primeng-controls/selectbutton/selectbutton.component';
 import { TextareaComponent } from '../../../shared/components/controls/primeng-controls/textarea/textarea.component';
-import { TogglebuttonComponent } from '../../../shared/components/controls/primeng-controls/togglebutton/togglebutton.component';
-import { ToggleswitchComponent } from '../../../shared/components/controls/primeng-controls/toggleswitch/toggleswitch.component';
 import { ContainerFormarrayComponent } from '../../../shared/components/container-formarray/container-formarray.component';
-import { ImagefieldComponent } from "../../../shared/components/controls/primeng-controls/imagefield/imagefield.component";
 import { AttachmentComponent } from "../../../shared/components/controls/primeng-controls/attachment/attachment.component";
 import { ImageInputComponent } from "../../../shared/components/controls/primeng-controls/image-input/image-input.component";
-
-
-
-
-// import { FileFieldComponent } from '../../controls/primeng/file-field/file-field.component';
-// import { ImageFieldComponent } from '../../controls/primeng/image-field/image-field.component';
-
+import { NativeInputtextComponent } from '../../../shared/components/controls/native-controls/inputtext/inputtext.component';
+import { BuilderPreferencesService } from '../../../core/services/builder-preferences.service';
+import { NativeInputNumberComponent } from "../../../shared/components/controls/native-controls/inputnumber/inputnumber.component";
+import { NativeCheckboxComponent } from "../../../shared/components/controls/native-controls/checkbox/checkbox.component";
+import { NativeDatepickerComponent } from "../../../shared/components/controls/native-controls/datepicker/datepicker.component";
+import { NativeMultiselectComponent } from "../../../shared/components/controls/native-controls/multiselect/multiselect.component";
+import { NativeRadiobuttonComponent } from "../../../shared/components/controls/native-controls/radiobutton/radiobutton.component";
+import { NativeAttachmentComponent } from "../../../shared/components/controls/native-controls/attachment/attachment.component";
+import { NativeSelectComponent } from "../../../shared/components/controls/native-controls/select/select.component";
+import { NativeTextareaComponent } from "../../../shared/components/controls/native-controls/textarea/textarea.component";
+import { NativePasswordComponent } from "../../../shared/components/controls/native-controls/password/password.component";
 
 @Component({
   selector: 'app-rerender',
@@ -39,7 +38,6 @@ import { ImageInputComponent } from "../../../shared/components/controls/primeng
     ReactiveFormsModule,
     // PrimeNG Control Components
     CheckboxComponent,
-    ColorpickerComponent,
     DatepickerComponent,
     InputnumberComponent,
     InputtextComponent,
@@ -47,14 +45,21 @@ import { ImageInputComponent } from "../../../shared/components/controls/primeng
     PasswordComponent,
     RadiobuttonComponent,
     SelectComponent,
-    SelectbuttonComponent,
-    TogglebuttonComponent,
-    ToggleswitchComponent,
     // Container containers (wrapped to avoid circular import eval order)
     forwardRef(() => ContainerFormarrayComponent),
     AttachmentComponent,
     ImageInputComponent,
-    TextareaComponent
+    TextareaComponent,
+    NativeInputtextComponent,
+    NativeInputNumberComponent,
+    NativeCheckboxComponent,
+    NativeDatepickerComponent,
+    NativeMultiselectComponent,
+    NativeRadiobuttonComponent,
+    NativeAttachmentComponent,
+    NativeSelectComponent,
+    NativeTextareaComponent,
+    NativePasswordComponent
 ],
   templateUrl: './rerender.component.html',
   styleUrl: './rerender.component.css',
@@ -82,7 +87,13 @@ export class RerenderComponent {
   alwaysTrue = (_drag?: any, _drop?: any) => true;
   arrayEditMode = false;
 
+  private readonly _builderPreferences = inject(BuilderPreferencesService);
+
   constructor(private _fbService: CreateformbuilderService) {}
+
+  isNativeLibrary(): boolean {
+    return this._builderPreferences.uiChoice() === 'native';
+  }
 
   ngOnInit(): void {
     this.initializeField();

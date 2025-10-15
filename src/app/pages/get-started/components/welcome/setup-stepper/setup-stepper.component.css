@@ -1,0 +1,48 @@
+  @keyframes spin-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      transform: scale(0);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 3s linear infinite;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Custom Stepper Styles */
+  :host ::ng-deep {
+    .custom-stepper {
+      .p-stepper-header {
+        padding: 1.5rem;
+      }
+
+    .p-stepper-content {
+      padding: 0;
+    }
+
+    .p-stepper-separator {
+      background: linear-gradient(to right, rgb(226, 232, 240), rgb(226, 232, 240));
+    }
+
+    .p-step-active .p-stepper-separator {
+      background: linear-gradient(to right, rgb(99, 102, 241), rgb(139, 92, 246));
+    }
+  }
+  }

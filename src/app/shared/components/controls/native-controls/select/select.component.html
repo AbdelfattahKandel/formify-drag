@@ -1,0 +1,38 @@
+<div class="flex flex-col gap-1">
+  @if (field().label) {
+    <label class="text-sm font-medium text-slate-700" [for]="controlId()">{{ field().label }}</label>
+  }
+
+  <div class="relative">
+    <select
+      class="w-full appearance-none rounded-md border border-slate-300 bg-white pr-10 pl-3 py-2 text-sm text-slate-800 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+      [id]="controlId()"
+      [attr.name]="controlName() ?? controlId()"
+      [value]="selectedToken()"
+      (change)="onNativeChange($event)"
+      [disabled]="isDisabled() || !options().length"
+      aria-haspopup="listbox"
+      aria-expanded="false"
+    >
+      @if (placeholder()) {
+        <option value="" [disabled]="true" [selected]="!selectedToken()">{{ placeholder() }}</option>
+      }
+      @for (option of options(); track trackOption($index, option)) {
+        <option
+          [value]="option.token"
+          [disabled]="isOptionDisabled(option)"
+          [selected]="selectedToken() === option.token"
+        >
+          {{ option.label }}
+        </option>
+      }
+    </select>
+    <span class="pointer-events-none absolute inset-y-0 right-0 mr-3 flex items-center text-slate-400">
+      <i class="fa-solid fa-chevron-down"></i>
+    </span>
+  </div>
+
+  @if (field().hint) {
+    <small class="text-xs text-slate-500">{{ field().hint }}</small>
+  }
+</div>

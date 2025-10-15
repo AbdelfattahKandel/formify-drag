@@ -1,0 +1,42 @@
+<div class="flex flex-col gap-1">
+  @if (field().label) {
+    <label class="text-sm font-medium text-slate-700" [for]="controlId()">{{ field().label }}</label>
+  }
+
+  @if (formControlInst()) {
+    <textarea
+      class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+      [formControl]="formControlInst()!"
+      [id]="controlId()"
+      [attr.placeholder]="placeholder()"
+      [attr.rows]="rows()"
+      [attr.maxlength]="maxLength() ?? null"
+      [disabled]="isDisabled()"
+    ></textarea>
+  } @else if (controlName()) {
+    <textarea
+      class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+      [formControlName]="controlName()!"
+      [id]="controlId()"
+      [attr.placeholder]="placeholder()"
+      [attr.rows]="rows()"
+      [attr.maxlength]="maxLength() ?? null"
+      [disabled]="isDisabled()"
+    ></textarea>
+  } @else {
+    <textarea
+      class="w-full rounded-md border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-500"
+      [id]="controlId()"
+      [attr.placeholder]="placeholder()"
+      [attr.rows]="rows()"
+      [attr.maxlength]="maxLength() ?? null"
+      [value]="fallbackValue()"
+      (input)="onFallbackInput($event)"
+      [disabled]="isDisabled()"
+    ></textarea>
+  }
+
+  @if (field().hint) {
+    <small class="text-xs text-slate-500">{{ field().hint }}</small>
+  }
+</div>

@@ -1,53 +1,6 @@
 <div class="unified-sidebar h-full">
   <p-accordion [multiple]="true" [activeIndex]="[0, 1]">
-    
-    <!-- 📄 Pages Section - HIDDEN (not needed in new structure) -->
-    <!--
-    <p-accordionTab>
-      <ng-template pTemplate="header">
-        <div class="flex items-center gap-2 w-full">
-          <i class="pi pi-file text-blue-600"></i>
-          <span class="font-semibold text-sm">Pages</span>
-          <p-badge [value]="pagesCount().toString()" severity="info" class="ml-auto"></p-badge>
-        </div>
-      </ng-template>
-      
-      <div class="space-y-1">
-        @for (page of pages(); track page.pageName) {
-          <div 
-            class="flex items-center justify-between p-2 rounded hover:bg-gray-100 cursor-pointer transition-colors"
-            [class.bg-blue-50]="isPageSelected(page.pageName)"
-            [class.border-l-4]="isPageSelected(page.pageName)"
-            [class.border-blue-500]="isPageSelected(page.pageName)"
-            (click)="onSelectPage(page.pageName)">
-            <span class="text-sm" [class.font-semibold]="isPageSelected(page.pageName)">
-              {{ page.pageName }}
-            </span>
-            @if (pages().length > 1) {
-              <button 
-                pButton 
-                icon="pi pi-times" 
-                class="p-button-text p-button-sm p-button-danger p-button-rounded"
-                (click)="onRemovePage(page.pageName, $event)"
-                pTooltip="Remove Page"
-                tooltipPosition="left">
-              </button>
-            }
-          </div>
-        }
-        
-        <button 
-          pButton 
-          icon="pi pi-plus" 
-          label="Add Page" 
-          class="p-button-sm p-button-outlined w-full mt-2"
-          (click)="onAddPage()">
-        </button>
-      </div>
-    </p-accordionTab>
-    -->
 
-    <!-- 📁 Forms Section (formerly Groups) -->
     <p-accordionTab>
       <ng-template pTemplate="header">
         <div class="flex items-center gap-2 w-full">

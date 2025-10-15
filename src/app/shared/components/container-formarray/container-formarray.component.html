@@ -142,18 +142,17 @@
     <div class="flex flex-col gap-2">
       <label class="text-sm font-medium">Type</label>
       <select class="p-inputtext p-component" formControlName="type">
-        <option value="input-text">Text</option>
+        <option value="input-text">Text Input</option>
+        <option value="password">Password</option>
         <option value="textarea">Textarea</option>
         <option value="select">Select</option>
-        <option value="checkbox">Checkbox</option>
-        <option value="imagefield">Images</option>
-        <option value="group">Group</option>
-        <option value="numberfield">Numberfield</option>
-        <option value="email">Email</option>
-        <option value="password">Password</option>
-        <option value="datepicker">Datepicker</option>
-        <option value="multiselect">Multiselect</option>
+        <option value="multi-select">Multi Select</option>
         <option value="radio">Radio</option>
+        <option value="checkbox">Checkbox</option>
+        <option value="datepicker">Date Picker</option>
+        <option value="input-number">Number</option>
+        <option value="attachment">Attachment</option>
+        <option value="array">Array</option>
       </select>
     </div>
       <p-button label="Add" icon="pi pi-check" [disabled]="addItemForm.invalid" (onClick)="confirmAdd()" />

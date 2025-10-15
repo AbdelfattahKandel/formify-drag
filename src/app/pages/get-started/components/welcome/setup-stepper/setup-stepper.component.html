@@ -1,0 +1,247 @@
+<main class="min-h-screen w-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-850 dark:to-slate-900 py-8 px-4">
+  <div class="container mx-auto max-w-6xl">
+    
+    <div class="text-center mb-8 space-y-3">
+      <div class="inline-flex items-center justify-center mb-4">
+        <div class="flex items-center gap-3 px-6 py-3 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 shadow-sm">
+          <i class="pi pi-cog text-blue-500 "></i>
+          <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Quick Setup</span>
+        </div>
+      </div>
+      
+      <h1 class="text-4xl md:text-5xl font-bold text-slate-900">
+        Configure Your <span class="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Workspace</span>
+      </h1>
+      
+      <p class="text-slate-600  text-lg max-w-2xl mx-auto">
+        Choose your preferred styling and components in just 2 steps
+      </p>
+    </div>
+
+    <div class=" dark:bg-slate-800 rounded-3xl shadow-2xl shadow-slate-200/50 dark:shadow-slate-950/50 overflow-hidden border border-slate-200 dark:border-slate-700">
+      <p-stepper 
+        [value]="activeIndex() + 1" 
+        [linear]="false"
+        styleClass="custom-stepper "
+      >
+        
+        <p-step-item [value]="1">
+          <p-step>
+            <div class="flex items-center gap-3 py-1">
+              <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-700">
+                <i class="pi pi-palette text-blue-600 dark:text-blue-400 text-lg"></i>
+              </div>
+              <div class="text-left">
+                <div class="font-bold text-slate-100">Styling</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400">Pick your CSS framework</div>
+              </div>
+            </div>
+          </p-step>
+          
+          <p-step-panel>
+            <ng-template #content>
+              <div class="p-6 md:p-10 space-y-8">
+                
+                <div class="space-y-2">
+                  <div class="flex items-center gap-3 mb-3">
+                    <div class="h-1 w-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+                    <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Step 1 of 2</span>
+                  </div>
+                  
+                  <h2 class="text-3xl font-bold text-slate-900 ">
+                    Choose Your Styling Framework
+                  </h2>
+                  
+                  <p class="text-slate-600 dark:text-slate-400 text-lg">
+                    Select the CSS framework that matches your development workflow
+                  </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 pt-4">
+                  @for (option of styleOptions; track option.id) {
+                    <div 
+                      class="group relative cursor-pointer rounded-2xl border-2 p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                      [ngClass]="getColorClasses(option.color, styleChoice() === option.id)"
+                      (click)="selectStyle(option.id)"
+                    >
+                      <div class="flex flex-col items-center gap-4 text-center">
+                        <div 
+                          class="flex h-14 w-14 items-center justify-center rounded-2xl transition-all duration-300 shadow-lg"
+                          [ngClass]="getIconColorClasses(option.color, styleChoice() === option.id)"
+                        >
+                          <i [class]="'pi ' + option.icon + ' text-2xl'"></i>
+                        </div>
+                        
+                        <div class="space-y-1">
+                          <span class="block font-bold text-lg text-slate-900 ">
+                            {{ option.label }}
+                          </span>
+                          <p class="text-sm text-slate-600 dark:text-slate-400">
+                            {{ option.description }}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      @if (styleChoice() === option.id) {
+                        <div 
+                          class="absolute -top-3 -right-3 flex h-8 w-8 items-center justify-center rounded-full  shadow-xl animate-scale-in"
+                          [ngClass]="getBadgeColorClass(option.color)"
+                        >
+                          <i class="pi pi-check font-bold"></i>
+                        </div>
+                      }
+                      
+                      <div class="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                           [style.box-shadow]="'0 0 30px rgba(59, 130, 246, 0.3)'">
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <div class="flex items-center gap-2 pt-4">
+                  <div class="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-500"
+                         [style.width]="styleChoice() ? '50%' : '0%'">
+                    </div>
+                  </div>
+                  <span class="text-sm font-medium text-slate-600 dark:text-slate-400 min-w-[60px]">
+                    {{ styleChoice() ? '50%' : '0%' }}
+                  </span>
+                </div>
+
+                <div class="flex justify-end pt-6">
+                  <p-button 
+                    label="Continue" 
+                    icon="pi pi-arrow-right" 
+                    iconPos="right"
+                    [disabled]="!styleChoice()" 
+                    (onClick)="next()"
+                    [style]="{ 'font-weight': '600' }"
+                    styleClass="p-button-lg"
+                  />
+                </div>
+              </div>
+            </ng-template>
+          </p-step-panel>
+        </p-step-item>
+
+        <p-step-item [value]="2">
+          <p-step>
+            <div class="flex items-center gap-3 py-1">
+              <div class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/30">
+                <i class="pi pi-th-large text-indigo-600 dark:text-indigo-400 text-lg"></i>
+              </div>
+              <div class="text-left">
+                <div class="font-bold text-slate-100 ">UI Library</div>
+                <div class="text-xs text-slate-500">Select your components</div>
+              </div>
+            </div>
+          </p-step>
+          
+          <p-step-panel>
+            <ng-template #content>
+              <div class="p-6 md:p-10 space-y-8">
+                
+                <div class="space-y-2">
+                  <div class="flex items-center gap-3 mb-3">
+                    <div class="h-1 w-12 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+                    <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Step 2 of 2</span>
+                  </div>
+                  
+                  <h2 class="text-3xl font-bold text-slate-900 ">
+                    Pick Your UI Component Library <span class="text-sm font-normal text-slate-500">(or Native)</span>
+                  </h2>
+                  
+                  <p class="text-slate-600 ">
+                    Choose the component system for building your forms
+                  </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                  @for (option of uiOptions; track option.id) {
+                    <div 
+                      class="group relative cursor-pointer rounded-2xl border-2 p-8 transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+                      [ngClass]="getColorClasses(option.color, uiChoice() === option.id)"
+                      (click)="selectUI(option.id)"
+                    >
+                      <div class="flex flex-col items-center gap-5 text-center">
+                        <div 
+                          class="flex h-20 w-20 items-center justify-center rounded-3xl transition-all duration-300 shadow-xl"
+                          [ngClass]="getIconColorClasses(option.color, uiChoice() === option.id)"
+                        >
+                          <i [class]="'pi ' + option.icon + ' text-4xl'"></i>
+                        </div>
+                        
+                        <div class="space-y-2">
+                          <span class="block font-bold text-2xl text-slate-900">
+                            {{ option.label }}
+                          </span>
+    
+                        </div>
+
+
+                      </div>
+                      
+                      @if (uiChoice() === option.id) {
+                        <div 
+                          class="absolute -top-3 -right-3 flex h-9 w-9 items-center justify-center rounded-full text-black shadow-2xl animate-scale-in"
+                          [ngClass]="getBadgeColorClass(option.color)"
+                        >
+                          <i class="pi pi-check text-lg font-bold"></i>
+                        </div>
+                      }
+                      
+                      <div class="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                           [style.box-shadow]="'0 0 40px rgba(99, 102, 241, 0.3)'">
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <div class="flex items-center gap-2 pt-4">
+                  <div class="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500"
+                         [style.width]="uiChoice() ? '100%' : '50%'">
+                    </div>
+                  </div>
+                  <span class="text-sm font-medium text-slate-600 dark:text-slate-400 min-w-[60px]">
+                    {{ uiChoice() ? '100%' : '50%' }}
+                  </span>
+                </div>
+
+                <div class="flex justify-between items-center pt-6 gap-4">
+                  <p-button 
+                    label="Back" 
+                    icon="pi pi-arrow-left" 
+                    severity="secondary"
+                    (onClick)="back()"
+                    [style]="{ 'font-weight': '600' }"
+                    styleClass="p-button-lg p-button-outlined"
+                  />
+                  
+                  <div class="flex items-center gap-3">
+
+                    
+                    <p-button 
+                      label="Complete Setup" 
+                      icon="pi pi-check-circle" 
+                      iconPos="right"
+                      [disabled]="!uiChoice()" 
+                      (onClick)="finish()"
+                      severity="success"
+                      [style]="{ 'font-weight': '600' }"
+                      styleClass="p-button-lg"
+                    />
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </p-step-panel>
+        </p-step-item>
+      </p-stepper>
+    </div>
+
+
+  </div>
+</main>
+

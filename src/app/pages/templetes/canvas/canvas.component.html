@@ -2,14 +2,10 @@
     <!-- Unified Sidebar: Pages + Groups + Controls -->
     <div class="w-[23vw]">
       <app-unified-sidebar
-        [pages]="pages()"
-        [currentPageName]="currentPage()"
         [groupNames]="currentGroupNames()"
         [selectedGroup]="selectedGroup()"
         [paletteTools]="paletteTools"
-        (pageSwitch)="onPageSwitch($event)"
         (pageAdd)="onPageAdd()"
-        (pageRemove)="onPageRemove($event)"
         (groupSelect)="onGroupSelect($event)"
         (groupAdd)="onGroupAdd($event)"
         (groupRemove)="onGroupRemove($event)">

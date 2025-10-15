@@ -1,15 +1,19 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { ToggleThemeService } from '../../core/services/toggle-theme.service';
 import { CommonModule } from '@angular/common';
-import { PaletteComponent } from '../templetes/palette/palette.component';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { ReactiveFormsModule, FormControl, FormBuilder } from '@angular/forms';
 import { Button } from "primeng/button";
-import { DropAreaComponent } from "../templetes/drop-area/drop-area.component";
 import { CreateformbuilderService } from '../../core/services/formbuilder/createformbuilder.service';
 import { CanvasComponent } from "../templetes/canvas/canvas.component";
-import { toolsConfig } from './tools.config';
+import { primengTools } from './tools.config';
+import { toolsMap } from './tools/tools-map';
 import { AppComponent } from '../../app.component';
+import { BuilderPreferencesService } from '../../core/services/builder-preferences.service';
+import { Router } from '@angular/router';
+import { FieldConfig } from '../../core/models/interfaces/legacy-extras';
+import { UiLibraryPreference } from '../../core/models/builder-preferences';
+
 
 type TabValue = 'primeng' | 'default';
 interface TabOption {
@@ -27,13 +31,11 @@ interface TabOption {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NodelayoutComponent {
-
-
-  
-  
   private _fb = inject(FormBuilder);
   private _toggleThemeService = inject(ToggleThemeService);
   private _formBuilderService = inject(CreateformbuilderService);
+  private _builderPreferencesService = inject(BuilderPreferencesService);
+  private _router = inject(Router);
   readonly tabs: TabOption[] = [
     { label: 'PrimeNG', value: 'primeng', icon: 'pi pi-prime' },
     { label: 'Default', value: 'default', icon: 'pi pi-list' },
@@ -42,7 +44,22 @@ export class NodelayoutComponent {
   selectionCtrl = this._fb.control<TabValue>('primeng');
 
   // Canonical FieldType palette prototypes
-  tools = toolsConfig.flatMap((tools) => tools) as any[];
+  private readonly _uiChoice = this._builderPreferencesService.uiChoice;
+  private readonly _tools = computed(() => {
+    const preference = this._uiChoice();
+    if (!preference) {
+      return primengTools;
+    }
+    return toolsMap[preference];
+  });
+
+  tools(): FieldConfig[] {
+    return this._tools();
+  }
+
+  uiChoice(): UiLibraryPreference | null {
+    return this._uiChoice();
+  }
 
   toggleTheme() {
     this._toggleThemeService.toggleDarkMode();
@@ -54,6 +71,10 @@ export class NodelayoutComponent {
     const theme = localStorage.getItem('theme');
     if (theme === 'dark') {
       this._toggleThemeService.toggleDarkMode();
+    }
+
+    if (!this._uiChoice()) {
+      this._router.navigateByUrl('/get-started');
     }
   }
 

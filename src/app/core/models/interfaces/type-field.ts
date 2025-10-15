@@ -1,11 +1,6 @@
 export type FieldType =
-  | 'autocomplete' // AutoCompleteModule
-  | 'cascade-select' // CascadeSelectModule
   | 'checkbox' // CheckboxModule
-  | 'colorpicker' // ColorPickerModule
   | 'datepicker' // DatePickerModule
-  | 'editor' // EditorModule
-  | 'float-label' // FloatLabelModule
   | 'icon-field' // IconFieldModule
   | 'input-icon' // InputIconModule
   | 'ifta-label' // IftaLabelModule
@@ -13,21 +8,12 @@ export type FieldType =
   | 'input-group-addon' // InputGroupAddonModule
   | 'input-mask' // InputMaskModule
   | 'input-number' // InputNumberModule
-  | 'input-otp' // InputOtpModule
   | 'input-text' // InputTextModule
-  | 'key-filter' // KeyFilterModule
-  | 'knob' // KnobModule
-  | 'listbox' // ListboxModule
+  | 'array' // FormArrayModule
+
   | 'multi-select' // MultiSelectModule
   | 'password' // PasswordModule
   | 'radio' // RadioButtonModule
-  | 'rating' // RatingModule
   | 'select' // SelectModule
-  | 'select-button' // SelectButtonModule
-  | 'slider' // SliderModule
   | 'textarea' // TextareaModule
-  | 'toggle-button' // ToggleButtonModule
-  | 'toggle-switch' // ToggleSwitchModule
-  | 'tree-select' // TreeSelectModule
-  | 'imagefield'
   | 'attachment'; // Custom Image Field (FormArray of filenames)

@@ -1,0 +1,50 @@
+<div class="w-full" (click)="$event.stopPropagation()" (mousedown)="$event.stopPropagation()">
+  <div class="rounded-lg border border-slate-300 bg-white shadow-sm">
+    <div class="flex flex-col gap-4 p-4 md:flex-row">
+      <div class="flex h-40 w-full items-center justify-center overflow-hidden rounded-md border border-dashed border-slate-300 md:w-1/2">
+        @if (imageUrl) {
+          <img [src]="imageUrl" alt="Preview" class="h-full w-full object-cover" />
+        } @else {
+          <div class="flex flex-col items-center justify-center gap-2 text-slate-400">
+            <span class="text-4xl"><i class="fa-solid fa-paperclip"></i></span>
+            <span class="text-sm">No preview available</span>
+          </div>
+        }
+      </div>
+
+      <div class="flex w-full flex-col gap-3 md:w-1/2">
+        <div class="flex items-center justify-between">
+          <div class="flex flex-col gap-1">
+            <span class="text-sm font-semibold text-slate-700">{{ field().label || 'Attachment' }}</span>
+            @if (field().hint) {
+              <span class="text-xs text-slate-500">{{ field().hint }}</span>
+            }
+            @if (displayValue()) {
+              <span class="text-xs text-blue-600">Selected: {{ displayValue() }}</span>
+            }
+          </div>
+          <button
+            type="button"
+            class="inline-flex items-center rounded-md border border-blue-500 px-3 py-1 text-sm font-medium text-blue-600 transition hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-400"
+            (click)="triggerFileInput()"
+            [disabled]="isDisabled()"
+          >
+            Upload
+          </button>
+        </div>
+
+        <input
+          #fileInput
+          type="file"
+          class="hidden"
+          [attr.accept]="acceptTypes()"
+          (change)="onFileSelected($event)"
+        />
+
+        @if (field().componentProps?.['description']) {
+          <p class="text-xs text-slate-500">{{ field().componentProps?.['description'] }}</p>
+        }
+      </div>
+    </div>
+  </div>
+</div>

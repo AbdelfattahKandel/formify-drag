@@ -1,0 +1,48 @@
+<div class="flex flex-col gap-1">
+  @if (field().label) {
+    <label class="text-sm font-medium text-slate-700" [for]="controlId()">{{ field().label }}</label>
+  }
+
+  <div class="relative">
+      @if (formControlInst()) {
+      <input
+        type="date"
+        class="w-full rounded-md border border-slate-300 bg-white pr-10 pl-3 py-2 text-sm text-slate-800 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+        [formControl]="formControlInst()!"
+        [id]="controlId()"
+        [attr.min]="minDate()"
+        [attr.max]="maxDate()"
+        [attr.placeholder]="placeholder()"
+      />
+    }
+    @if (controlName()) {
+      <input
+          type="date"
+          class="w-full rounded-md border border-slate-300 bg-white pr-10 pl-3 py-2 text-sm text-slate-800 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+          [formControlName]="controlName()!"
+          [id]="controlId()"
+          [attr.min]="minDate()"
+          [attr.max]="maxDate()"
+          [attr.placeholder]="placeholder()"
+        />
+    }
+    @if (!formControlInst() && !controlName()) {
+      <input
+        type="date"
+        class="w-full rounded-md border border-slate-200 bg-slate-100 pr-10 pl-3 py-2 text-sm text-slate-400"
+        [id]="controlId()"
+        [attr.placeholder]="placeholder()"
+        disabled
+      />
+    }
+    <span class="pointer-events-none absolute inset-y-0 right-0 mr-2 flex items-center text-lg text-slate-300">
+      <i class="fa-solid fa-calendar"></i>
+    </span>
+  </div>
+@if (field().hint) {
+    <small class="text-xs text-slate-500">{{ field().hint }}</small>
+}
+@if (displayValue()) {
+    <small class="text-xs text-blue-600">Selected: {{ displayValue() }}</small>
+}
+</div>

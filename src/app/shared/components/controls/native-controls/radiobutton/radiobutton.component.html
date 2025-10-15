@@ -1,0 +1,30 @@
+<div class="flex flex-col gap-2">
+  @if (field().label) {
+    <span class="text-sm font-medium text-slate-700">{{ field().label }}</span>
+  }
+
+  <div class="flex flex-col gap-2 rounded-md border border-transparent p-1">
+    @for (option of options(); track trackByValue($index, option)) {
+      <label
+        class="flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm transition hover:bg-slate-50"
+        [class.opacity-60]="isOptionDisabled(option)"
+        [attr.for]="optionId($index)"
+      >
+        <input
+          type="radio"
+          class="h-4 w-4 border border-slate-400 text-blue-600 focus:ring-blue-500"
+          [id]="optionId($index)"
+          [name]="groupName()"
+          [disabled]="isOptionDisabled(option)"
+          [checked]="isSelectedOption(option.value)"
+          (change)="onInputChange(option.value)"
+        />
+        <span class="text-slate-700">{{ option.label }}</span>
+      </label>
+    }
+  </div>
+
+  @if (field().hint) {
+    <small class="text-xs text-slate-500">{{ field().hint }}</small>
+  }
+</div>
