@@ -72,11 +72,9 @@ export class CreateformbuilderService {
       childLabel: child.label
     });
     if (parent.kind !== 'array') {
-      console.error('❌ [Service] Parent is not an array! Kind:', parent.kind);
       return;
     }
     this.updateContainerChildren(parent, child, false);
-    console.log('✅ [Service] Array updated successfully');
   }
 
   // Import/Export

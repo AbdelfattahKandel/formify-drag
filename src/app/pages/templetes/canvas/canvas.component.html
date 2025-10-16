@@ -72,7 +72,7 @@
   
           @for (tool of droppedTools; track tool.formControl || tool.id || $index) {
           <div cdkDrag [cdkDragData]="tool" (click)="onFieldSelected(tool)" class="field-container"
-               [style.grid-column]="'span ' + (tool.fieldStyle?.columns || 1)"
+               [style.grid-column]="'span ' + (tool.fieldStyle?.columns || 2)"
                [style.width]="tool.fieldStyle?.width || '100%'">
             <!-- Field actions removed for minimal UI -->
             
@@ -86,7 +86,8 @@
               </app-rerender>
             </form>
 
-          </div>}
+          </div>
+        }
         </div>
       </div>
     </div>

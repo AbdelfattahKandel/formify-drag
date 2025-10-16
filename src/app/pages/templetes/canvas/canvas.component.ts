@@ -74,6 +74,8 @@ import { BuilderPreferencesService } from '../../../core/services/builder-prefer
   ]
 })
 export class CanvasComponent implements OnInit, OnDestroy {
+
+
   private _fb = inject(FormBuilder);
 
   // Services
